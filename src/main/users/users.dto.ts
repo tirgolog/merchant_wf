@@ -1,18 +1,20 @@
 
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
 export class CreateUserDto {
 
   @IsNotEmpty()
-  firstname: string;
-
-  @IsNotEmpty()
-  lastname: string;
+  fullName: string;
 
   @IsNotEmpty()
   username: string;
 
   @IsNotEmpty()
+  @IsUUID()
+  merchantId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
   role: string;
 
   @IsNotEmpty()
@@ -21,7 +23,6 @@ export class CreateUserDto {
   // @IsEmail()
   // @IsNotEmpty()
   email?: string;
-
 }
 
 export class UpdateUserDto {

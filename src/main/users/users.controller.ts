@@ -34,6 +34,18 @@ export class UsersController {
       return bpmResponse;
     }
 
+    @Get('merchant')
+    async getMerchantUsers(@Query() id: string) {
+      let bpmResponse;
+      const list = await this.usersService.getMerchantUsers(id);
+      if (list.length) {
+         bpmResponse = new BpmResponse(true, list);
+      } else {
+         bpmResponse = new BpmResponse(false, null, [ResponseStauses.NotFound]);
+      }
+      return bpmResponse;
+    }
+
     @Post('')
     @UsePipes(ValidationPipe)
     async createUser(@Body() createUserDto: CreateUserDto) {

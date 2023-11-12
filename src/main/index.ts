@@ -1,11 +1,32 @@
+import { CargoType } from "./cargo-type/cargo-type.entity";
+import { Cargo } from "./cargo/cargo.entity";
+import { Currency } from "./currencies/currency.entity";
+import { BankAccount } from "./merchants/entities/bank-account.entity";
+import { Merchant } from "./merchants/entities/merchant.entity";
+import { Role } from "./roles/role.entity";
+import { TransportType } from "./transport-type/transport-type.entity";
 import { User } from "./users/user.entity";
 
 const entities = [
-  User
+  User,
+  Merchant,
+  BankAccount,
+  Currency,
+  Role,
+  TransportType,
+  CargoType,
+  Cargo
 ];
 
 export {
-  User
+  User,
+  Merchant,
+  BankAccount,
+  Currency,
+  Role,
+  TransportType,
+  CargoType,
+  Cargo
 };
 export default entities;
 

@@ -1,15 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Currency } from '../currencies/currency.entity';
+import { Merchant } from '../merchants/entities/merchant.entity';
+import { Role } from '../roles/role.entity';
+import { Cargo } from '../cargo/cargo.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id?: string;
 
   @Column({ nullable: false })
-  firstname: string;
-
-  @Column({ nullable: false })
-  lastname: string;
+  fullName: string;
 
   @Column({ nullable: false, unique: true })
   username: string;
@@ -17,11 +18,20 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
-  @Column({ nullable: false })
+  @ManyToOne(() => Role, (role) => role.users)
   role: string;
 
   @Column({ nullable: true })
-  email: string;
+  email?: string;
+
+  @ManyToOne(() => Merchant, (merchant) => merchant.users)
+  merchant: string;
+
+  @OneToMany(() => Currency, (currency) => currency.createdBy)
+  currencies?: string;
+
+  @OneToMany(() => Cargo, (cargo) => cargo.createdBy)
+  cargo?: string;
 
   @Column({ default: new Date() })
   createdAt?: Date;
