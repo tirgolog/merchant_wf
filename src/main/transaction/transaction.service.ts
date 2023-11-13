@@ -1,0 +1,137 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { BpmResponse } from '..';
+import { Transaction } from './transaction.entity';
+import { TransactionDto } from './transaction.dto';
+
+@Injectable()
+export class TransactionService {
+  constructor(
+    @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>,
+  ) { }
+
+  async getTransactions() {
+    try {
+      const data = await this.transactionsRepository.find({
+        where: { active: true },
+        select: ['amount', 'createdAt', 'createdBy', 'id', 'transactionType'],
+        relations: ['createdBy']
+      });
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async getTransactionsByMerchant(id: string) {
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Id is required']);
+      }
+      const data = await this.transactionsRepository.find({
+        where: { active: true, merchant: id },
+        relations: ['createdBy']
+      });
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async getTransactionsByUser(id: string) {
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Id is required']);
+      }
+      const data = await this.transactionsRepository.find({
+        where: { active: true, createdBy: id },
+        relations: ['createdBy']
+      });
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async getMerchantBalance(id: string) {
+    try {
+
+      if(!id) {
+        return new BpmResponse(false, null, ['Merchant is required']);
+      }
+      const topup = await this.transactionsRepository.find({ where: { active: true, merchant: id, transactionType: 'topup' } });
+      const withdrow = await this.transactionsRepository.find({ where: { active: true, merchant: id, transactionType: 'withdrow' } });
+      const topupBalance = topup.reduce((a: any, b: any) => a + b, 0);
+      const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b, 0);
+      return new BpmResponse(true, { topup: topupBalance, withdrow: withdrowBalance }, null)
+    } catch(error) {
+      console.log(error)
+      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async findTransactionById(id: string) {
+    try {
+      const data = await this.transactionsRepository.findOne({ where: { id, active: true } });
+      return new BpmResponse(true, data, null);
+    } catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async createTransaction(createTransactionDto: TransactionDto, userId: string) {
+    try {
+      const transaction: Transaction = await this.transactionsRepository.create();
+      transaction.transactionType = createTransactionDto.transactionType;
+      transaction.amount = createTransactionDto.amount;
+      transaction.merchant = createTransactionDto.merchantId;
+      transaction.createdBy = userId;
+
+      const newTransaction = await this.transactionsRepository.save(transaction);
+      if (newTransaction) {
+        return new BpmResponse(true, newTransaction, null)
+      }
+    } catch (error: any) {
+      console.log(error)
+      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async updateTransaction(id: string, updateTransactionDto: TransactionDto): Promise<BpmResponse> {
+    try {
+      const transaction: Transaction = await this.transactionsRepository.findOneBy({ id });
+      transaction.transactionType = updateTransactionDto.transactionType || transaction.transactionType;
+      transaction.amount = updateTransactionDto.amount || transaction.amount;
+      transaction.merchant = updateTransactionDto.merchantId || transaction.merchant;
+
+      const updatedTransaction = await this.transactionsRepository.save(transaction)
+      if (updatedTransaction) {
+        return new BpmResponse(true, updatedTransaction, null);
+      }
+
+    } catch (error: any) {
+      console.log(error)
+      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async deleteTransaction(id: string): Promise<BpmResponse> {
+    if(!id) {
+      return new BpmResponse(false, null, ['Id is required']);
+    }
+    const isDeleted = await this.transactionsRepository.createQueryBuilder()
+      .update(Transaction)
+      .set({ active: false })
+      .where("id = :id", { id })
+      .execute();
+    if (isDeleted.affected) {
+      return new BpmResponse(true, 'Successfully updated', null);
+    } else {
+      return new BpmResponse(true, 'Update failed', null);
+    }
+  }
+}

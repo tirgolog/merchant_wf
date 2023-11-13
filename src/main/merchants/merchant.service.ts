@@ -21,7 +21,7 @@ export class MerchantService {
     try {
       const data: any = await this.merchantsRepository.find({
         where: { active: true },
-        relations: ['users']
+        relations: ['users', 'cargos']
       });
       for (let i = 0; i < data.length; i++) {
         const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data[i].id }, relations: ['currency'] })
@@ -41,7 +41,7 @@ export class MerchantService {
     try {
       const data: any = await this.merchantsRepository.find({
         where: { active: true, verified: true },
-        relations: ['users']
+        relations: ['users', 'cargos']
       });
       for (let i = 0; i < data.length; i++) {
         const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data[i].id }, relations: ['currency'] })

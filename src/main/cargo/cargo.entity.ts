@@ -3,6 +3,7 @@ import { User } from '../users/user.entity';
 import { Currency } from '../currencies/currency.entity';
 import { CargoType } from '../cargo-type/cargo-type.entity';
 import { TransportType } from '../transport-type/transport-type.entity';
+import { Merchant } from '../merchants/entities/merchant.entity';
 
 @Entity()
 export class Cargo {
@@ -55,6 +56,9 @@ export class Cargo {
 
   @Column({ default: new Date() })
   createdAt?: Date;
+
+  @ManyToOne(() => Merchant, (merchant) => merchant.cargos, { nullable: false })
+  merchant: string;
 
   @ManyToOne(() => User, (user) => user.cargo)
   createdBy?: string;

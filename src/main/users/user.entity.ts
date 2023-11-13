@@ -3,6 +3,7 @@ import { Currency } from '../currencies/currency.entity';
 import { Merchant } from '../merchants/entities/merchant.entity';
 import { Role } from '../roles/role.entity';
 import { Cargo } from '../cargo/cargo.entity';
+import { Transaction } from '../transaction/transaction.entity';
 
 @Entity()
 export class User {
@@ -32,6 +33,9 @@ export class User {
 
   @OneToMany(() => Cargo, (cargo) => cargo.createdBy)
   cargo?: string;
+
+  @OneToMany(() => Transaction, (finance) => finance.createdBy)
+  transactions?: string;
 
   @Column({ default: new Date() })
   createdAt?: Date;

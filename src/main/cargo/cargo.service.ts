@@ -24,6 +24,22 @@ export class CargosService {
     }
   }
 
+  async getMerchantCargos(id: string) {
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Merchant id is required !']);   
+      }
+      const data = await this.cargoTypesRepository.find({
+        where: { active: true, merchant: id },
+        relations: ['createdBy', 'currency', 'cargoType', 'transportType']
+      });
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
   async findCargoById(id: string) {
     try {
       const data = await this.cargoTypesRepository.findOne({
@@ -45,6 +61,7 @@ export class CargosService {
       cargo.cargoType = createCargoDto.cargoTypeId;
       cargo.sendCargoDate = createCargoDto.sendCargoDate;
       cargo.sendCargoTime = createCargoDto.sendCargoTime;
+      cargo.merchant = createCargoDto.merchantId;
       cargo.currency = createCargoDto.currencyId || null;
       cargo.offeredPrice = createCargoDto.offeredPrice || null;
       cargo.cargoWeight = createCargoDto.cargoWeight || null;
@@ -102,6 +119,9 @@ export class CargosService {
   }
 
   async deleteCargo(id: string): Promise<BpmResponse> {
+    if(!id) {
+      return new BpmResponse(false, null, ['Id is required !']);   
+    }
     const isDeleted = await this.cargoTypesRepository.createQueryBuilder()
       .update(Cargo)
       .set({ active: false })

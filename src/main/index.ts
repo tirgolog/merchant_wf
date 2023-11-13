@@ -1,6 +1,7 @@
 import { CargoType } from "./cargo-type/cargo-type.entity";
 import { Cargo } from "./cargo/cargo.entity";
 import { Currency } from "./currencies/currency.entity";
+import { Transaction } from "./transaction/transaction.entity";
 import { BankAccount } from "./merchants/entities/bank-account.entity";
 import { Merchant } from "./merchants/entities/merchant.entity";
 import { Role } from "./roles/role.entity";
@@ -15,7 +16,8 @@ const entities = [
   Role,
   TransportType,
   CargoType,
-  Cargo
+  Cargo,
+  Transaction
 ];
 
 export {
@@ -26,7 +28,8 @@ export {
   Role,
   TransportType,
   CargoType,
-  Cargo
+  Cargo,
+  Transaction
 };
 export default entities;
 

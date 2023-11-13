@@ -1,6 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BankAccount } from './bank-account.entity';
 import { User } from 'src/main/users/user.entity';
+import { Cargo } from 'src/main/cargo/cargo.entity';
+import { Transaction } from 'src/main/transaction/transaction.entity';
 
 @Entity()
 export class Merchant {
@@ -60,6 +62,12 @@ export class Merchant {
   
   @OneToMany(() => User, (user) => user.merchant)
   users?: string;
+
+  @OneToMany(() => Cargo, (carrgo) => carrgo.merchant)
+  cargos?: string;
+
+  @OneToMany(() => Transaction, (finance) => finance.merchant)
+  transactions?: string;
 
   @Column({ default: false })
   verified?: boolean;

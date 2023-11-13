@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, ParseIntPipe, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "src/shared/guards/auth/auth.guard";
 import { BpmResponse, ResponseStauses } from "..";
 import { CreateUserDto, UpdateUserDto } from "./users.dto";
@@ -57,6 +57,12 @@ export class UsersController {
         bpmResponse = new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
       }
       return bpmResponse;
+    }
+
+    @Patch('password')
+    @UsePipes(ValidationPipe)
+    async changePass(@Query('id') id: string, @Body() body: { id: string, password: string, newPassword: string }) {
+      return this.usersService.changeUserPassword(body.password, body.newPassword, id);
     }
 
     @Put('')

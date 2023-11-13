@@ -5,6 +5,8 @@ import { RolesModule } from "./roles/role.module";
 import { TransportTypesModule } from "./transport-type/transport-type.module";
 import { UsersModule } from "./users/users.module";
 import { CargosModule } from "./cargo/cargo.module";
+import { TransactionsModule } from "./transaction/transaction.module";
+import { CargoTypesModule } from "./cargo-type/cargo-type.module";
 
 @Module({
     imports: [
@@ -13,7 +15,9 @@ import { CargosModule } from "./cargo/cargo.module";
         CurrenciesModule,
         RolesModule,
         TransportTypesModule,
-        CargosModule
+        CargosModule,
+        CargoTypesModule,
+        TransactionsModule
     ],
     controllers: [
     ],

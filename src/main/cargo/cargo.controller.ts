@@ -18,6 +18,11 @@ export class CargoController {
     return this.cargosService.getCargos();
   }
 
+  @Get('merchant')
+  async getAllMerchant(@Query('id') id: string) {
+    return this.cargosService.getMerchantCargos(id);
+  }
+
   @Post()
   @UsePipes(ValidationPipe)
   async create(@Body() createCargoDto: CargoDto, @Req() req: Request) {

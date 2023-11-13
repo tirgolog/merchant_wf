@@ -27,6 +27,10 @@ export class CargoDto {
   sendCargoTime: string;
 
   @IsUUID()
+  @IsNotEmpty()
+  merchantId: string;
+
+  @IsUUID()
   currencyId?: string;
   offeredPrice?: number;
   cargoWeight?: number;

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './users.dto';
 import * as bcrypt from 'bcrypt';
+import { BpmResponse } from '..';
 
 @Injectable()
 export class UsersService {
@@ -83,5 +84,24 @@ export class UsersService {
       .where("id = :id", { id })
       .execute();
     return isDeleted.affected ? true : false;
+  }
+
+  async changeUserPassword(password: string, newPassword: string, id: string) {
+    if(!password || !newPassword || !id) {
+      return new BpmResponse(false, null, ['All fields are required'])
+    }
+    const user: User = await this.usersRepository.findOne({ where: { active: true, id } }); 
+    if(!user) {
+      return new BpmResponse(false, null, ['User not found']);
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
+      return new BpmResponse(false, null, ['Old password is invalid']);
+    } else {
+      const saltOrRounds = 10;
+      const passwordHash = await bcrypt.hash(newPassword, saltOrRounds);
+      user.password = passwordHash;
+      await this.usersRepository.save(user);
+      return new BpmResponse(true, null, ['Updated'])
+    }
   }
 }
