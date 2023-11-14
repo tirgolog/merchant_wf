@@ -46,7 +46,7 @@ export class CargosService {
     try {
       const data = await this.cargoRepository.findOne({
          where: { id, active: true },
-         relations: ['createdBy', 'currency', 'cargoType', 'transportType']
+         relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
         });
       return new BpmResponse(true, data, null);
     } catch (error: any) {

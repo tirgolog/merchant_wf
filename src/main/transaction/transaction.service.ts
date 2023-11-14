@@ -22,7 +22,7 @@ export class TransactionService {
     }
     catch (error: any) {
       console.log(error)
-    }
+    } 
   }
 
   async getTransactionsByMerchant(id: string) {
@@ -30,10 +30,11 @@ export class TransactionService {
       if(!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
-      const data = await this.transactionsRepository.find({
-        where: { active: true, merchant: id },
-        relations: ['createdBy']
+      let data = await this.transactionsRepository.find({
+        where: { active: true },
+        relations: ['createdBy', 'merchant']
       });
+      data = data.filter((el: any) => el.merchant?.id == id);
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -63,10 +64,14 @@ export class TransactionService {
       if(!id) {
         return new BpmResponse(false, null, ['Merchant is required']);
       }
-      const topup = await this.transactionsRepository.find({ where: { active: true, merchant: id, transactionType: 'topup' } });
-      const withdrow = await this.transactionsRepository.find({ where: { active: true, merchant: id, transactionType: 'withdrow' } });
-      const topupBalance = topup.reduce((a: any, b: any) => a + b, 0);
-      const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b, 0);
+      let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup' }, relations: ['merchant'] });
+      topup = topup.filter((el: any) => el.merchant?.id == id)
+      let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow' }, relations: ['merchant'] });
+      withdrow = withdrow.filter((el: any) => el.merchant?.id == id)
+      
+      const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
+      const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
+      console.log({ topup: topupBalance, withdrow: withdrowBalance })
       return new BpmResponse(true, { topup: topupBalance, withdrow: withdrowBalance }, null)
     } catch(error) {
       console.log(error)
@@ -77,7 +82,11 @@ export class TransactionService {
   async findTransactionById(id: string) {
     try {
       const data = await this.transactionsRepository.findOne({ where: { id, active: true } });
-      return new BpmResponse(true, data, null);
+      if(data) {
+        return new BpmResponse(true, data, null);
+      } else {
+        return new BpmResponse(false, null, ['Not found']);
+      }
     } catch (error: any) {
       console.log(error)
     }
