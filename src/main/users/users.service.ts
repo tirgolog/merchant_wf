@@ -47,7 +47,7 @@ export class UsersService {
   }
 
   findUserByUsername(username: string) {
-    return this.usersRepository.findOne({ where: { username, active: true }, relations: ['role'] });
+    return this.usersRepository.findOne({ where: { username, active: true }, relations: ['role', 'merchant'] });
   }
 
   async createUser(createUserDto: CreateUserDto) {
