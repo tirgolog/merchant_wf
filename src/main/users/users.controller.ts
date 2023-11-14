@@ -78,6 +78,19 @@ export class UsersController {
       return bpmResponse;
     }
 
+    @Patch('state')
+    @UsePipes(ValidationPipe)
+    async disableUser(@Query('id') id: string) {
+      let bpmResponse;
+      const isUpdated = await this.usersService.changeUserState(id);
+      if(isUpdated) {
+        bpmResponse = new BpmResponse(true, [ResponseStauses.SuccessfullyUpdated]);
+      } else {
+        bpmResponse = new BpmResponse(false, null, [ResponseStauses.UpdateDataFailed]);
+      }
+      return bpmResponse;
+    }
+
     @Delete('')
     async deleteUser(@Query('id') id: string) {
       let bpmResponse;

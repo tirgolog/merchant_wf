@@ -22,14 +22,20 @@ export class CreateUserDto {
 
   // @IsEmail()
   // @IsNotEmpty()
-  email?: string;
+  phoneNumber?: string;
 }
 
 export class UpdateUserDto {
-  firstname: string;
-  lastname: string;
+  @IsNotEmpty()
+  fullName: string;
+
+  @IsNotEmpty()
   username: string;
-  password: string;
-  email: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  role: string;
+
+  phoneNumber?: string;
 
 }

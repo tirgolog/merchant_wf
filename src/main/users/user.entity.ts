@@ -16,6 +16,9 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
+  @Column({ nullable: true })
+  phoneNumber?: string;
+
   @Column({ nullable: false })
   password: string;
 
@@ -42,4 +45,7 @@ export class User {
 
   @Column({ default: true })
   active?: boolean;
+  
+  @Column({ default: false })
+  disabled?: boolean;
 }
