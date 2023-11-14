@@ -30,6 +30,16 @@ export class TransactionController {
     return this.transactionsService.getTransactionsByMerchant(id);
   }
 
+  @Get('merchant/verified')
+  async getAllByVerifiedMerchant(@Query('id') id: string) {
+    return this.transactionsService.getVerifiedTransactionsByMerchant(id);
+  }
+
+  @Get('merchant/rejected')
+  async getAllByRejectedMerchant(@Query('id') id: string) {
+    return this.transactionsService.getRejetedTransactionsByMerchant(id);
+  }
+
   @Get('merchant/balance')
   async getBalanceByMerchant(@Query('id') id: string) {
     return this.transactionsService.getMerchantBalance(id);
@@ -47,12 +57,12 @@ export class TransactionController {
     return this.transactionsService.updateTransaction(id, updateTransactionDto);
   }
   
-  @Patch()
+  @Patch('verify')
   async verify(@Query('id') id: string) {
     return this.transactionsService.verifyTransaction(id);
   }
   
-  @Patch()
+  @Patch('reject')
   async reject(@Query('id') id: string) {
     return this.transactionsService.rejectTransaction(id);
   }
