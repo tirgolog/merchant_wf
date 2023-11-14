@@ -20,6 +20,7 @@ export class UsersService {
         username: el.username,
         createdAt: el.createdAt,
         active: el.active,
+        disabled: el.disabled,
         role: { id: el.role.id, name: el.role.name, description: el.role.description }
       }
     });
@@ -33,6 +34,7 @@ export class UsersService {
         username: el.username,
         createdAt: el.createdAt,
         active: el.active,
+        disabled: el.disabled,
         role: { id: el.role.id, name: el.role.name, description: el.role.description }
       }
     });
@@ -57,24 +59,24 @@ export class UsersService {
     let createuserObj: User = {
       fullName: createUserDto.fullName,
       username: createUserDto.username,
+      phoneNumber: createUserDto.phoneNumber,
       role: createUserDto.role,
       password: passwordHash,
       merchant: createUserDto.merchantId
-    }
-    if (createUserDto.email) {
-      createuserObj.email = createUserDto.email;
     }
     const newUser = this.usersRepository.create(createuserObj);
     return this.usersRepository.save(newUser);
   }
 
   async updateUser(id: string, updates: any): Promise<boolean> {
-    const isUpdated = await this.usersRepository.createQueryBuilder()
-      .update(User)
-      .set(updates)
-      .where("id = :id", { id })
-      .execute()
-    return isUpdated.affected ? true : false;
+    const user: User = await this.usersRepository.findOne({ where: { id, active: true } });
+    user.fullName = updates.fullName || user.fullName;
+    user.username = updates.username || user.username;
+    user.phoneNumber = updates.phoneNumber || user.phoneNumber;
+    user.role = updates.role || user.role;
+    user.password = user.password;
+    const updated = await this.usersRepository.save(user);
+    return updated ? true : false;
   }
 
   async deleteUser(id: string): Promise<boolean> {
@@ -86,12 +88,23 @@ export class UsersService {
     return isDeleted.affected ? true : false;
   }
 
+  async changeUserState(id: string): Promise<boolean> {
+    const user: User = await this.usersRepository.findOne({ where: { id } })
+    if (!user) {
+      return false;
+    }
+    user.disabled = !user.disabled;
+    this.usersRepository.save(user);
+    return true
+
+  }
+
   async changeUserPassword(password: string, newPassword: string, id: string) {
-    if(!password || !newPassword || !id) {
+    if (!password || !newPassword || !id) {
       return new BpmResponse(false, null, ['All fields are required'])
     }
-    const user: User = await this.usersRepository.findOne({ where: { active: true, id } }); 
-    if(!user) {
+    const user: User = await this.usersRepository.findOne({ where: { active: true, id } });
+    if (!user) {
       return new BpmResponse(false, null, ['User not found']);
     }
     if (!(await bcrypt.compare(password, user.password))) {
