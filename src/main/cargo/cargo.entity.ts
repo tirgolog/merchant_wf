@@ -13,6 +13,7 @@ export class Cargo {
   @Column({ nullable: false })
   sendLocation: string;
 
+  @Column({ nullable: true })
   cargoDeliveryLocation?: string;
 
   @ManyToOne(() => TransportType, (transportType) => transportType.cargo, { nullable: false })

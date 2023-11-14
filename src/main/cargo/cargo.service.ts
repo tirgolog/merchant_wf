@@ -8,12 +8,12 @@ import { CargoDto } from './cargo.dto';
 @Injectable()
 export class CargosService {
   constructor(
-    @InjectRepository(Cargo) private readonly cargoTypesRepository: Repository<Cargo>,
+    @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
   ) { }
 
   async getCargos() {
     try {
-      const data = await this.cargoTypesRepository.find({
+      const data = await this.cargoRepository.find({
         where: { active: true },
         relations: ['createdBy', 'currency', 'cargoType', 'transportType']
       });
@@ -29,10 +29,12 @@ export class CargosService {
       if(!id) {
         return new BpmResponse(false, null, ['Merchant id is required !']);   
       }
-      const data = await this.cargoTypesRepository.find({
-        where: { active: true, merchant: id },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportType']
+      let data: any = await this.cargoRepository.find({
+        where: { active: true },
+        relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
       });
+      data = data.filter((el: any) => el.merchant.id == id);
+ 
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -42,7 +44,7 @@ export class CargosService {
 
   async findCargoById(id: string) {
     try {
-      const data = await this.cargoTypesRepository.findOne({
+      const data = await this.cargoRepository.findOne({
          where: { id, active: true },
          relations: ['createdBy', 'currency', 'cargoType', 'transportType']
         });
@@ -74,7 +76,7 @@ export class CargosService {
       cargo.createdBy = userId;
 
 
-      const newCargo = await this.cargoTypesRepository.save(cargo);
+      const newCargo = await this.cargoRepository.save(cargo);
       if (newCargo) {
         return new BpmResponse(true, newCargo, null)
       }
@@ -87,7 +89,7 @@ export class CargosService {
   async updateCargo(id: string, updateCargoDto: CargoDto): Promise<BpmResponse> {
     try {
 
-      const cargo: Cargo = await this.cargoTypesRepository.findOneBy({ id, active: true });
+      const cargo: Cargo = await this.cargoRepository.findOneBy({ id, active: true });
       if(!cargo) {
         return new BpmResponse(false, null, ['Cargo not found']);
       }
@@ -107,7 +109,7 @@ export class CargosService {
       cargo.isCashlessPayment = updateCargoDto.isCashlessPayment || cargo.isCashlessPayment;
       cargo.isUrgent = updateCargoDto.isUrgent || cargo.isUrgent;
 
-      const updatedCargo = await this.cargoTypesRepository.save(cargo)
+      const updatedCargo = await this.cargoRepository.save(cargo)
       if (updatedCargo) {
         return new BpmResponse(true, updatedCargo, null);
       }
@@ -122,7 +124,7 @@ export class CargosService {
     if(!id) {
       return new BpmResponse(false, null, ['Id is required !']);   
     }
-    const isDeleted = await this.cargoTypesRepository.createQueryBuilder()
+    const isDeleted = await this.cargoRepository.createQueryBuilder()
       .update(Cargo)
       .set({ active: false })
       .where("id = :id", { id })
