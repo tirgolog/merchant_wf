@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch, Post, Put, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
 import { TransactionDto } from "./transaction.dto";
 import { TransactionService } from "./transaction.service";
 
@@ -45,6 +45,16 @@ export class TransactionController {
   @UsePipes(ValidationPipe)
   async update(@Query('id') id: string, @Body() updateTransactionDto: TransactionDto) {
     return this.transactionsService.updateTransaction(id, updateTransactionDto);
+  }
+  
+  @Patch()
+  async verify(@Query('id') id: string) {
+    return this.transactionsService.verifyTransaction(id);
+  }
+  
+  @Patch()
+  async reject(@Query('id') id: string) {
+    return this.transactionsService.rejectTransaction(id);
   }
 
   @Delete()
