@@ -16,6 +16,12 @@ export class Transaction {
   @ManyToOne(() => Merchant, (merchant) => merchant.transactions)
   merchant?: string;
 
+  @Column({ default: false })
+  verified?: boolean;
+
+  @Column({ default: false })
+  rejected?: boolean;
+
   @Column({ default: new Date() })
   createdAt?: Date;
 

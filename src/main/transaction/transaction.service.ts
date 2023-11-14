@@ -42,6 +42,40 @@ export class TransactionService {
     }
   }
 
+  async getVerifiedTransactionsByMerchant(id: string) {
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Id is required']);
+      }
+      let data = await this.transactionsRepository.find({
+        where: { active: true, verified: true },
+        relations: ['createdBy', 'merchant']
+      });
+      data = data.filter((el: any) => el.merchant?.id == id);
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async getRejetedTransactionsByMerchant(id: string) {
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Id is required']);
+      }
+      let data = await this.transactionsRepository.find({
+        where: { active: true, rejected: true },
+        relations: ['createdBy', 'merchant']
+      });
+      data = data.filter((el: any) => el.merchant?.id == id);
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
   async getTransactionsByUser(id: string) {
     try {
       if(!id) {
@@ -104,6 +138,42 @@ export class TransactionService {
       if (newTransaction) {
         return new BpmResponse(true, newTransaction, null)
       }
+    } catch (error: any) {
+      console.log(error)
+      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async verifyTransaction(id: string): Promise<BpmResponse> {
+    try {
+      const transaction: Transaction = await this.transactionsRepository.findOneBy({ id, active: true, rejected: false });
+      if(!transaction) {
+        return new BpmResponse(false, null, ['Transaction not found']);
+      }
+      transaction.verified = true;
+      const updatedTransaction = await this.transactionsRepository.save(transaction)
+      if (updatedTransaction) {
+        return new BpmResponse(true, 'Verified', null);
+      }
+
+    } catch (error: any) {
+      console.log(error)
+      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async rejectTransaction(id: string): Promise<BpmResponse> {
+    try {
+      const transaction: Transaction = await this.transactionsRepository.findOneBy({ id, active: true, verified: false });
+      if(!transaction) {
+        return new BpmResponse(false, null, ['Transaction not found']);
+      }
+      transaction.rejected = true;
+      const updatedTransaction = await this.transactionsRepository.save(transaction)
+      if (updatedTransaction) {
+        return new BpmResponse(true, 'Verified', null);
+      }
+
     } catch (error: any) {
       console.log(error)
       throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
