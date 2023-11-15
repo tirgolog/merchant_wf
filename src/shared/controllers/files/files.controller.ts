@@ -1,20 +1,15 @@
-// your.controller.ts
-import { Controller, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { FileUploadInterceptor } from 'src/shared/interceptors/file-upload.interceptor';
-import { fileUploadMiddleware } from 'src/shared/middlewares/file-upload.middleware';
-import { FilesService } from '../../services/file.service';
+// file-upload.controller.ts
+import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/shared/multer.config';
 
-@Controller('api/v1/files')
-export class FilesController {
-
-  constructor(
-    private filesService: FilesService
-  ) { }
-  
-  @Post('upload')
-  @UseInterceptors(new FileUploadInterceptor(fileUploadMiddleware))
-  async uploadFile(@UploadedFile() file: File) {
-    console.log(file)
-    // this.filesService.writeFile(file);
+@Controller('api/v1/file/upload')
+export class FileUploadController {
+  @Post()
+  @UseInterceptors(FileInterceptor('file', multerConfig))
+  uploadFile(@UploadedFile() file: File) {
+    console.log(file);
+    // You can perform additional operations with the uploaded file here
+    return { message: 'File uploaded successfully' };
   }
 }
