@@ -3,7 +3,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { MainModule } from 'src/main/main.module';
 import { AuthController } from '../controllers/auth/auth.controller';
-import { FilesController } from '../controllers/files/files.controller';
 import { AuthGuard } from '../guards/auth/auth.guard';
 import { AuthService } from '../services/auth/auth.service';
 import { FilesService } from '../services/file.service';
@@ -27,7 +26,7 @@ import { FilesService } from '../services/file.service';
     },
   
   ],
-  controllers: [AuthController, FilesController],
+  controllers: [AuthController],
   exports: [AuthService]
 })
 export class AuthModule {}

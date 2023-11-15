@@ -6,6 +6,7 @@ import { MainModule } from './main/main.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from './main/index';
 import { AuthModule } from './shared/modules/auth.module';
+import { FileUploadModule } from './shared/modules/file-upload.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AuthModule } from './shared/modules/auth.module';
       inject: [ConfigService],
     }),
     MainModule,
-    AuthModule
+    AuthModule,
+    FileUploadModule
   ],
   controllers: [AppController],
   providers: [AppService],
