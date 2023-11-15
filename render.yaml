@@ -1,0 +1,10 @@
+
+# render.yaml
+
+services:
+  - name: merchant-wf
+    buildCommand: npm install
+    startCommand: npm start
+    prebuild:
+      - npm install rimraf
+      - npm run prebuild
