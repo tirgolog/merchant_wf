@@ -1,5 +1,5 @@
 // file-upload.controller.ts
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerConfig } from 'src/shared/multer.config';
 
@@ -7,8 +7,8 @@ import { multerConfig } from 'src/shared/multer.config';
 export class FileUploadController {
   @Post()
   @UseInterceptors(FileInterceptor('file', multerConfig))
-  uploadFile(@UploadedFile() file: File) {
-    console.log(file);
+  uploadFile(@UploadedFile() file: any, @Req() req: Request) {
+    // console.log(file, req.body);
     // You can perform additional operations with the uploaded file here
     return { message: 'File uploaded successfully' };
   }

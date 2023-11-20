@@ -6,8 +6,8 @@ import { Transaction } from 'src/main/transaction/transaction.entity';
 
 @Entity()
 export class Merchant {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column({ nullable: false, unique: true })
   email: string;

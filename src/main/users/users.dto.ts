@@ -10,8 +10,7 @@ export class CreateUserDto {
   username: string;
 
   @IsNotEmpty()
-  @IsUUID()
-  merchantId: string;
+  merchantId: number;
 
   @IsNotEmpty()
   @IsUUID()

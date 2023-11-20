@@ -7,8 +7,8 @@ import { Merchant } from '../merchants/entities/merchant.entity';
 
 @Entity()
 export class Cargo {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column({ nullable: false })
   sendLocation: string;
@@ -59,7 +59,7 @@ export class Cargo {
   createdAt?: Date;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.cargos, { nullable: false })
-  merchant: string;
+  merchant: number;
 
   @ManyToOne(() => User, (user) => user.cargo)
   createdBy?: string;

@@ -7,7 +7,7 @@ export class BankAccount {
   id: string;
 
   @Column({ nullable: false })
-  merchantId: string;
+  merchantId: number;
 
   @Column({ nullable: false })
   account: string;

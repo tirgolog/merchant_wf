@@ -9,7 +9,7 @@ export class CargoController {
   ) { }
 
   @Get('id')
-  async getById(@Query('id') id: string) {
+  async getById(@Query('id') id: number) {
     return this.cargosService.findCargoById(id);
   }
 
@@ -19,7 +19,7 @@ export class CargoController {
   }
 
   @Get('merchant')
-  async getAllMerchant(@Query('id') id: string) {
+  async getAllMerchant(@Query('id') id: number) {
     return this.cargosService.getMerchantCargos(id);
   }
 
@@ -31,12 +31,12 @@ export class CargoController {
 
   @Put()
   @UsePipes(ValidationPipe)
-  async update(@Query('id') id: string, @Body() updateCargoDto: CargoDto) {
+  async update(@Query('id') id: number, @Body() updateCargoDto: CargoDto) {
     return this.cargosService.updateCargo(id, updateCargoDto);
   }
 
   @Delete()
-  async delete(@Query('id') id: string) {
+  async delete(@Query('id') id: number) {
     return this.cargosService.deleteCargo(id);
   }
 }

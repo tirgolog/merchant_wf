@@ -10,7 +10,7 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id?: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   fullName: string;
 
   @Column({ nullable: false, unique: true })
@@ -29,7 +29,7 @@ export class User {
   email?: string;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.users)
-  merchant: string;
+  merchant: number;
 
   @OneToMany(() => Currency, (currency) => currency.createdBy)
   currencies?: string;
@@ -42,6 +42,9 @@ export class User {
 
   @Column({ default: new Date() })
   createdAt?: Date;
+
+  @Column({ default: new Date() })
+  lastLogin?: Date;
 
   @Column({ default: true })
   active?: boolean;

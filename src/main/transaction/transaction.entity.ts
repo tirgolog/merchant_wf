@@ -14,7 +14,7 @@ export class Transaction {
   amount: number;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.transactions)
-  merchant?: string;
+  merchant?: number;
 
   @Column({ default: false })
   verified?: boolean;

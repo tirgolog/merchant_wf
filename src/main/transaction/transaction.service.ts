@@ -1,31 +1,35 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BpmResponse } from '..';
 import { Transaction } from './transaction.entity';
 import { TransactionDto } from './transaction.dto';
+import { CustomHttpException } from 'src/shared/exceptions/custom-http-exception';
 
 @Injectable()
 export class TransactionService {
+
+  private readonly logger = new Logger(TransactionService.name);
+
   constructor(
     @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>,
   ) { }
 
-  async getTransactions() {
+  async getTransactions(): Promise<BpmResponse> {
     try {
       const data = await this.transactionsRepository.find({
         where: { active: true },
         select: ['amount', 'createdAt', 'createdBy', 'id', 'transactionType'],
-        relations: ['createdBy']
+        relations: ['createdBy'],
       });
       return new BpmResponse(true, data, null);
+    } catch (error: any) {
+      this.logger.error(`Error while fetching transactions: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching transactions', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
-    catch (error: any) {
-      console.log(error)
-    } 
   }
 
-  async getTransactionsByMerchant(id: string) {
+  async getTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Id is required']);
@@ -38,11 +42,12 @@ export class TransactionService {
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
-      console.log(error)
+      this.logger.error(`Error while fetching transactions by merchant: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching transactions by merchant', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async getVerifiedTransactionsByMerchant(id: string) {
+  async getVerifiedTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Id is required']);
@@ -55,11 +60,12 @@ export class TransactionService {
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
-      console.log(error)
+      this.logger.error(`Error while fetching verified transactions: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching verified transactions', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async getRejetedTransactionsByMerchant(id: string) {
+  async getRejetedTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Id is required']);
@@ -72,48 +78,50 @@ export class TransactionService {
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
-      console.log(error)
+      this.logger.error(`Error while fetching rejected transactions: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching rejected transactions', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async getTransactionsByUser(id: string) {
+  async getTransactionsByUser(id: string): Promise<BpmResponse> {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
-      const data = await this.transactionsRepository.find({
-        where: { active: true, createdBy: id },
+      let data = await this.transactionsRepository.find({
+        where: { active: true, verified: true },
         relations: ['createdBy']
       });
+      data = data.filter((el: any) => el.createdBy['id'] == id);
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
-      console.log(error)
+      this.logger.error(`Error while fetching transactions by user: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching transactions by user', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async getMerchantBalance(id: string) {
+  async getMerchantBalance(id: number): Promise<BpmResponse> {
     try {
 
       if(!id) {
         return new BpmResponse(false, null, ['Merchant is required']);
       }
-      let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup' }, relations: ['merchant'] });
+      let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup', verified: true }, relations: ['merchant'] });
       topup = topup.filter((el: any) => el.merchant?.id == id)
-      let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow' }, relations: ['merchant'] });
+      let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow', verified: true }, relations: ['merchant'] });
       withdrow = withdrow.filter((el: any) => el.merchant?.id == id)
       
       const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
       const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
-      console.log({ topup: topupBalance, withdrow: withdrowBalance })
-      return new BpmResponse(true, { topup: topupBalance, withdrow: withdrowBalance }, null)
+      return new BpmResponse(true, { topup: topupBalance - 500, withdrow: withdrowBalance }, null)
     } catch(error) {
-      console.log(error)
-      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+      this.logger.error(`Error while fetching merchant balance: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching merchant balance', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async findTransactionById(id: string) {
+  async findTransactionById(id: string): Promise<BpmResponse> {
     try {
       const data = await this.transactionsRepository.findOne({ where: { id, active: true } });
       if(data) {
@@ -122,11 +130,12 @@ export class TransactionService {
         return new BpmResponse(false, null, ['Not found']);
       }
     } catch (error: any) {
-      console.log(error)
+      this.logger.error(`Error while fetching transaction by id: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while fetching transaction by id', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
-  async createTransaction(createTransactionDto: TransactionDto, userId: string) {
+  async createTransaction(createTransactionDto: TransactionDto, userId: string): Promise<BpmResponse> {
     try {
       const transaction: Transaction = await this.transactionsRepository.create();
       transaction.transactionType = createTransactionDto.transactionType;
@@ -139,8 +148,8 @@ export class TransactionService {
         return new BpmResponse(true, newTransaction, null)
       }
     } catch (error: any) {
-      console.log(error)
-      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+      this.logger.error(`Error while creating transaction: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while creating transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
@@ -157,8 +166,8 @@ export class TransactionService {
       }
 
     } catch (error: any) {
-      console.log(error)
-      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+      this.logger.error(`Error while verifing transaction: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while verifing transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
@@ -171,12 +180,12 @@ export class TransactionService {
       transaction.rejected = true;
       const updatedTransaction = await this.transactionsRepository.save(transaction)
       if (updatedTransaction) {
-        return new BpmResponse(true, 'Verified', null);
+        return new BpmResponse(true, 'Rejeted', null);
       }
 
     } catch (error: any) {
-      console.log(error)
-      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+      this.logger.error(`Error while rejecting transaction: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while rejecting transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
@@ -193,24 +202,30 @@ export class TransactionService {
       }
 
     } catch (error: any) {
-      console.log(error)
-      throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+      this.logger.error(`Error while updating transaction: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while updating transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
   }
 
   async deleteTransaction(id: string): Promise<BpmResponse> {
-    if(!id) {
-      return new BpmResponse(false, null, ['Id is required']);
+    try {
+      if(!id) {
+        return new BpmResponse(false, null, ['Id is required']);
+      }
+      const isDeleted = await this.transactionsRepository.createQueryBuilder()
+        .update(Transaction)
+        .set({ active: false })
+        .where("id = :id", { id })
+        .execute();
+      if (isDeleted.affected) {
+        return new BpmResponse(true, 'Successfully deleted', null);
+      } else {
+        return new BpmResponse(true, 'Delete failed', null);
+      }
     }
-    const isDeleted = await this.transactionsRepository.createQueryBuilder()
-      .update(Transaction)
-      .set({ active: false })
-      .where("id = :id", { id })
-      .execute();
-    if (isDeleted.affected) {
-      return new BpmResponse(true, 'Successfully updated', null);
-    } else {
-      return new BpmResponse(true, 'Update failed', null);
+    catch(error: any) {
+      this.logger.error(`Error while deleting transaction: ${error.message}`, error.stack);
+      throw new CustomHttpException('Error while deleting transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
-  }
+    } 
 }

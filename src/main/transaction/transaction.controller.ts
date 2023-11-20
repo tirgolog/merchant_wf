@@ -26,22 +26,22 @@ export class TransactionController {
 
   
   @Get('merchant')
-  async getAllByMerchant(@Query('id') id: string) {
+  async getAllByMerchant(@Query('id') id: number) {
     return this.transactionsService.getTransactionsByMerchant(id);
   }
 
   @Get('merchant/verified')
-  async getAllByVerifiedMerchant(@Query('id') id: string) {
+  async getAllByVerifiedMerchant(@Query('id') id: number) {
     return this.transactionsService.getVerifiedTransactionsByMerchant(id);
   }
 
   @Get('merchant/rejected')
-  async getAllByRejectedMerchant(@Query('id') id: string) {
+  async getAllByRejectedMerchant(@Query('id') id: number) {
     return this.transactionsService.getRejetedTransactionsByMerchant(id);
   }
 
   @Get('merchant/balance')
-  async getBalanceByMerchant(@Query('id') id: string) {
+  async getBalanceByMerchant(@Query('id') id: number) {
     return this.transactionsService.getMerchantBalance(id);
   }
 

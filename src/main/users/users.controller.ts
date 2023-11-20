@@ -35,7 +35,7 @@ export class UsersController {
     }
 
     @Get('merchant')
-    async getMerchantUsers(@Query() id: string) {
+    async getMerchantUsers(@Query() id: number) {
       let bpmResponse;
       const list = await this.usersService.getMerchantUsers(id);
       if (list.length) {
@@ -61,7 +61,7 @@ export class UsersController {
 
     @Patch('password')
     @UsePipes(ValidationPipe)
-    async changePass(@Query('id') id: string, @Body() body: { id: string, password: string, newPassword: string }) {
+    async changePass(@Query('id') id: string, @Body() body: { password: string, newPassword: string }) {
       return this.usersService.changeUserPassword(body.password, body.newPassword, id);
     }
 

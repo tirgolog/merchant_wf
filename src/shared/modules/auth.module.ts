@@ -6,9 +6,11 @@ import { AuthController } from '../controllers/auth/auth.controller';
 import { AuthGuard } from '../guards/auth/auth.guard';
 import { AuthService } from '../services/auth/auth.service';
 import { FilesService } from '../services/file.service';
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
+    HttpModule,
     MainModule,
     JwtModule.register({
       global: true,
