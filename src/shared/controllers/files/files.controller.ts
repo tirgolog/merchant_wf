@@ -2,6 +2,7 @@
 import { Controller, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerConfig } from 'src/shared/multer.config';
+import { Request } from "express";
 
 @Controller('api/v1/file/upload')
 export class FileUploadController {
