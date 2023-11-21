@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './users.dto';
 import * as bcrypt from 'bcrypt';
@@ -13,7 +13,7 @@ export class UsersService {
   ) { }
 
   async getUsers() {
-    return (await this.usersRepository.find({ where: { active: true }, relations: ['role'] })).map((el: any) => {
+    return (await this.usersRepository.find({ where: { active: true, username: Not('adminuseRname') }, relations: ['role'] })).map((el: any) => {
       return {
         id: el.id,
         fullName: el.fullName,
@@ -21,13 +21,14 @@ export class UsersService {
         createdAt: el.createdAt,
         active: el.active,
         disabled: el.disabled,
+        lastLogin: el.lastLogin,
         role: { id: el.role.id, name: el.role.name, description: el.role.description }
       }
     });
   }
 
-  async getMerchantUsers(id: string) {
-    return (await this.usersRepository.find({ where: { active: true, merchant: id }, relations: ['role'] })).map((el: any) => {
+  async getMerchantUsers(id: number) {
+    return (await this.usersRepository.find({ where: { active: true, merchant: id, username: Not('adminuseRname') }, relations: ['role'] })).map((el: any) => {
       return {
         id: el.id,
         fullName: el.fullName,
@@ -35,6 +36,7 @@ export class UsersService {
         createdAt: el.createdAt,
         active: el.active,
         disabled: el.disabled,
+        lastLogin: el.lastLogin,
         role: { id: el.role.id, name: el.role.name, description: el.role.description }
       }
     });
@@ -74,6 +76,7 @@ export class UsersService {
     user.username = updates.username || user.username;
     user.phoneNumber = updates.phoneNumber || user.phoneNumber;
     user.role = updates.role || user.role;
+    user.lastLogin = updates.lastLogin || user.lastLogin;
     user.password = user.password;
     const updated = await this.usersRepository.save(user);
     return updated ? true : false;

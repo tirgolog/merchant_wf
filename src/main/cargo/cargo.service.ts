@@ -8,14 +8,18 @@ import { CargoDto } from './cargo.dto';
 @Injectable()
 export class CargosService {
   constructor(
-    @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
+    @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>
   ) { }
 
   async getCargos() {
     try {
-      const data = await this.cargoRepository.find({
+      const data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportType']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportType']
+      });
+      data.forEach((el: any) => {
+        el.id = 'M'+el.id;
+        el.isMerchant = true;
       });
       return new BpmResponse(true, data, null);
     }
@@ -24,7 +28,7 @@ export class CargosService {
     }
   }
 
-  async getMerchantCargos(id: string) {
+  async getMerchantCargos(id: number) {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Merchant id is required !']);   
@@ -34,7 +38,10 @@ export class CargosService {
         relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
       });
       data = data.filter((el: any) => el.merchant.id == id);
- 
+      data.forEach((el: any) => {
+        el.id = 'M'+el.id;
+        el.isMerchant = true;
+      });
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -42,12 +49,14 @@ export class CargosService {
     }
   }
 
-  async findCargoById(id: string) {
+  async findCargoById(id: number) {
     try {
-      const data = await this.cargoRepository.findOne({
+      const data: any = await this.cargoRepository.findOne({
          where: { id, active: true },
          relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
         });
+        data.id = 'M'+data.id;
+        data.isMerchant = true;
       return new BpmResponse(true, data, null);
     } catch (error: any) {
       console.log(error)
@@ -86,7 +95,7 @@ export class CargosService {
     }
   }
 
-  async updateCargo(id: string, updateCargoDto: CargoDto): Promise<BpmResponse> {
+  async updateCargo(id: number, updateCargoDto: CargoDto): Promise<BpmResponse> {
     try {
 
       const cargo: Cargo = await this.cargoRepository.findOneBy({ id, active: true });
@@ -120,7 +129,7 @@ export class CargosService {
     }
   }
 
-  async deleteCargo(id: string): Promise<BpmResponse> {
+  async deleteCargo(id: number): Promise<BpmResponse> {
     if(!id) {
       return new BpmResponse(false, null, ['Id is required !']);   
     }

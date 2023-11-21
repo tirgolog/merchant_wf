@@ -4,7 +4,9 @@ import { AuthService } from 'src/shared/services/auth/auth.service';
 
 @Controller('api/v1/auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    ) { }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')

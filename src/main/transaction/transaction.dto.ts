@@ -1,5 +1,5 @@
 
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 import { PrimaryGeneratedColumn } from "typeorm";
 
 export class TransactionDto {
@@ -13,8 +13,7 @@ export class TransactionDto {
   @IsNotEmpty()
   amount: number;
 
-  @IsUUID()
   @IsNotEmpty()
-  merchantId: string;
+  merchantId: number;
 
 }

@@ -6,13 +6,17 @@ import { Merchant } from "./entities/merchant.entity";
 import { MerchantService } from "./merchant.service";
 import { UsersModule } from "../users/users.module";
 import { RolesModule } from "../roles/role.module";
+import { CargosModule } from "../cargo/cargo.module";
+import { TransactionsModule } from "../transaction/transaction.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Merchant]),
         TypeOrmModule.forFeature([BankAccount]),
         UsersModule,
-        RolesModule
+        RolesModule,
+        CargosModule,
+        TransactionsModule
     ],
     controllers: [
         MerchantController

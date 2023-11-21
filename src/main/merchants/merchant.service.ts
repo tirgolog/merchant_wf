@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Merchant } from './entities/merchant.entity';
 import { MerchantDto } from './merchant.dto';
-import { BpmResponse, User, Role } from '..';
+import { BpmResponse, User, Role, Cargo, Transaction } from '..';
 import { BankAccount } from './entities/bank-account.entity';
 import { CreateUserDto } from '../users/users.dto';
 
@@ -14,7 +14,9 @@ export class MerchantService {
     @InjectRepository(Merchant) private readonly merchantsRepository: Repository<Merchant>,
     @InjectRepository(BankAccount) private readonly bankAccountRepository: Repository<BankAccount>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectRepository(Role) private readonly rolesRepository: Repository<Role>
+    @InjectRepository(Role) private readonly rolesRepository: Repository<Role>,
+    @InjectRepository(Cargo) private readonly cargosRepository: Repository<Cargo>,
+    @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>
   ) { }
 
   async getMerchants() {
@@ -43,12 +45,19 @@ export class MerchantService {
         where: { active: true, verified: true },
         relations: ['users', 'cargos']
       });
+      let transactions = await this.transactionsRepository.find({where: { active: true, verified: true }, relations: ['merchant']});
+      const cargos = await this.cargosRepository.find({ where: { active: true }, relations: ['merchant'] });
       for (let i = 0; i < data.length; i++) {
-        const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data[i].id }, relations: ['currency'] })
+        const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data[i]?.id }, relations: ['currency'] })
         const accountData = bankAccount.map((el: any) => {
           return { account: el.account, currencyName: el.currency?.name }
         })
         data[i].bankAccounts = accountData;
+        data[i].cargosCount = cargos.filter((el: any) => el.merchant['id'] == data[i].id).length;
+        const rawTransactions = transactions.filter((el: any) => el.merchant['id'] == data[i]?.id);
+        const topup = rawTransactions.filter((el: any) => el.transactionType == 'topup').reduce((a: any, b: any) => a + b.amount, 0);
+        const withdraw = rawTransactions.filter((el: any) => el.transactionType == 'withdrow').reduce((a: any, b: any) => a + b.amount, 0);
+        data[i].balance = (topup - 500) - withdraw;
       }
       return new BpmResponse(true, data, null);
     }
@@ -77,10 +86,15 @@ export class MerchantService {
     }
   }
 
-  async findMerchantById(id: string) {
+  async findMerchantById(id: number) {
     try {
       const data = await this.merchantsRepository.findOne({ where: { id, active: true } });
       if (data) {
+          const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data.id }, relations: ['currency'] })
+          const accountData = bankAccount.map((el: any) => {
+            return { account: el.account, currencyName: el.currency?.name }
+          })
+          data.bankAccounts = accountData;
         return new BpmResponse(true, data, null);
       } else {
         return new BpmResponse(false, null, ['Not found']);
@@ -164,7 +178,7 @@ export class MerchantService {
     }
   }
 
-  async updateMerchant(id: string, updateMerchantDto: MerchantDto): Promise<BpmResponse> {
+  async updateMerchant(id: number, updateMerchantDto: MerchantDto): Promise<BpmResponse> {
     try {
 
       const merchant: Merchant = await this.merchantsRepository.findOneBy({ id });
@@ -217,6 +231,7 @@ export class MerchantService {
       }
       const updatedMerchant = await this.merchantsRepository.save(merchant);
       if (updateMerchantDto.bankAccounts) {
+        await this.bankAccountRepository.delete({ merchantId: merchant.id });
         updateMerchantDto.bankAccounts.forEach((el: any) => el.merchantId = updatedMerchant.id)
         const accounts: any = updateMerchantDto.bankAccounts;
         this.bankAccountRepository
@@ -236,7 +251,7 @@ export class MerchantService {
     }
   }
 
-  async verifyMerchant(id: string): Promise<BpmResponse> {
+  async verifyMerchant(id: number): Promise<BpmResponse> {
     try {
 
       const merchant: Merchant = await this.merchantsRepository.findOneBy({ id });
@@ -244,12 +259,14 @@ export class MerchantService {
         merchant.verified = true;
         const verifed = await this.merchantsRepository.save(merchant);
         if (verifed) {
-          const role = (await this.rolesRepository.findOne({ where: { name: 'Super admin' }})).id;
-          const userObj: CreateUserDto = {
+          const role = (await this.rolesRepository.findOne({ where: { name: 'Super admin' }}))?.id;
+          const saltOrRounds = 10;
+          const passwordHash = await bcrypt.hash(merchant.password, saltOrRounds);
+          const userObj: any = {
             fullName: merchant.supervisorFullName,
-            password: merchant.password,
+            password: passwordHash,
             username: merchant.email,
-            merchantId: merchant.id,
+            merchant: id,
             role: role
           }
           this.usersRepository.save(userObj);
@@ -264,7 +281,7 @@ export class MerchantService {
     }
   }
 
-  async rejectMerchant(id: string): Promise<BpmResponse> {
+  async rejectMerchant(id: number): Promise<BpmResponse> {
     try {
 
       const merchant: Merchant = await this.merchantsRepository.findOneBy({ id });
@@ -283,7 +300,7 @@ export class MerchantService {
     }
   }
 
-  async deleteMerchant(id: string): Promise<BpmResponse> {
+  async deleteMerchant(id: number): Promise<BpmResponse> {
     const isDeleted = await this.merchantsRepository.createQueryBuilder()
       .update(Merchant)
       .set({ active: false })
