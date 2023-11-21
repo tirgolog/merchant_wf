@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Put, Req, Query, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CargosService } from "./cargo.service";
 import { CargoDto } from "./cargo.dto";
+import { Request } from "express";
 
 @Controller('api/v1/cargo')
 export class CargoController {

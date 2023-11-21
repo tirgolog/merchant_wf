@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post, Put, Query, Req, UsePipes, ValidationPipe } from "@nestjs/common";
 import { TransactionDto } from "./transaction.dto";
 import { TransactionService } from "./transaction.service";
+import { Request } from "express";
 
 @Controller('api/v1/transaction')
 export class TransactionController {
