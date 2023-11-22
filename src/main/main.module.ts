@@ -29,5 +29,4 @@ import { CargoTypesModule } from "./cargo-type/cargo-type.module";
     ]
 })
 export class MainModule {
-
 }
