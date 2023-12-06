@@ -26,7 +26,6 @@ import { HttpModule } from "@nestjs/axios";
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-  
   ],
   controllers: [AuthController],
   exports: [AuthService]

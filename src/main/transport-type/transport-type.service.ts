@@ -34,10 +34,11 @@ export class TransportTypesService {
 
   async createTransportType(createTransportTypeDto: TransportTypeDto) {
     try {
-      const role: TransportType = await this.transportTypesRepository.create();
-      role.name = createTransportTypeDto.name;
+      const transportType: TransportType = await this.transportTypesRepository.create();
+      transportType.name = createTransportTypeDto.name;
+      transportType.code = createTransportTypeDto.code;
 
-      const newTransportType = await this.transportTypesRepository.save(role);
+      const newTransportType = await this.transportTypesRepository.save(transportType);
       if (newTransportType) {
         return new BpmResponse(true, newTransportType, null)
       }

@@ -19,6 +19,11 @@ export class CargoController {
     return this.cargosService.getCargos();
   }
 
+  @Get('all-driver')
+  async getAllDriverCargos() {
+    return this.cargosService.getDriverCargos();
+  }
+
   @Get('merchant')
   async getAllMerchant(@Query('id') id: number) {
     return this.cargosService.getMerchantCargos(id);
@@ -28,6 +33,12 @@ export class CargoController {
   @UsePipes(ValidationPipe)
   async create(@Body() createCargoDto: CargoDto, @Req() req: Request) {
     return this.cargosService.createCargo(createCargoDto, req['user']?.id);
+  }
+
+  @Post('accept-offer')
+  @UsePipes(ValidationPipe)
+  async acceptOffer(@Body() acceptCargoDto: any, @Req() req: Request) {
+    return this.cargosService.acceptCargo(acceptCargoDto, req['user']?.id);
   }
 
   @Put()

@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from './main/index';
 import { AuthModule } from './shared/modules/auth.module';
 import { FileUploadModule } from './shared/modules/file-upload.module';
+import { SharedModule } from './shared/modules/shared.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { FileUploadModule } from './shared/modules/file-upload.module';
     }),
     MainModule,
     AuthModule,
-    FileUploadModule
+    FileUploadModule,
+    SharedModule
   ],
   controllers: [AppController],
   providers: [

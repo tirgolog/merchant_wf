@@ -10,6 +10,9 @@ export class TransportType {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: true })
+  code: string;
+
   @OneToMany(() => User, (user) => user.role)
   users?: string;
 

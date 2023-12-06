@@ -1,15 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BpmResponse } from '..';
 import { Cargo } from './cargo.entity';
 import { CargoDto } from './cargo.dto';
+import axios from 'axios';
+import * as amqp from 'amqplib';
 
 @Injectable()
 export class CargosService {
   constructor(
-    @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>
+    @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
+    // private readonly rabbitMQService: RabbitMQService
   ) { }
+
+  connection: any;
+  channel: any;
 
   async getCargos() {
     try {
@@ -28,19 +34,69 @@ export class CargosService {
     }
   }
 
+  async getDriverCargos() {
+    try {
+      const data: any = await this.cargoRepository.find({
+        where: { active: true },
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportType']
+      });
+      data.forEach((el: any) => {
+        el.id = 'M'+el.id;
+        el.isMerchant = true;
+        el.driverId = 0;
+        el.acceptedOrders = [];
+        el.transportTypes = [el.transportType?.code];
+      });
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
+  async finishCargo(id: number): Promise<BpmResponse> {
+    try {
+      // Perform cargo finishing logic
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
+      cargo.status = 2;
+      await this.cargoRepository.save(cargo);
+
+      return new BpmResponse(true, null, null);
+    } catch (error: any) {
+      console.error(error);
+      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getToken() {
+    await axios.post('http://192.168.1.218:7790/users/login', {phone: '998935421324'})
+    const testData = await axios.post('http://192.168.1.218:7790/users/codeverify', {phone: '998935421324', code: '00000'})
+    return testData.data?.token
+  }
+  
+
   async getMerchantCargos(id: number) {
     try {
       if(!id) {
         return new BpmResponse(false, null, ['Merchant id is required !']);   
       }
+      const token = await this.getToken();
+      const testData = await axios.get('http://192.168.1.218:7790/users/getAcceptedOrdersDriver', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const acceptedOrders = testData.data.data[0]
       let data: any = await this.cargoRepository.find({
         where: { active: true },
         relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
       });
-      data = data.filter((el: any) => el.merchant.id == id);
+      data = data?.filter((el: any) => el.merchant.id == id);
       data.forEach((el: any) => {
+        const data = acceptedOrders?.filter((order: any) => order.orderid == el.id);
         el.id = 'M'+el.id;
         el.isMerchant = true;
+        el.acceptedOrders = data;
       });
       return new BpmResponse(true, data, null);
     }
@@ -92,6 +148,44 @@ export class CargosService {
     } catch (error: any) {
       console.log(error)
       throw new HttpException('internal error', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async acceptCargo(createCargoDto: any, userId: string) {
+    try {
+      // Connect to RabbitMQ
+      this.connection = await amqp.connect('amqp://localhost');
+      this.channel = await this.connection.createChannel();
+
+      // Send message to RabbitMQ queue
+      await this.channel.assertQueue('acceptDriverOffer');
+      await this.channel.sendToQueue('acceptDriverOffer', Buffer.from(JSON.stringify(createCargoDto)));
+
+      // Update cargo status in the database
+      console.log(createCargoDto)
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: createCargoDto.orderid } });
+      console.log('Cargo status before update:', cargo.status);
+
+      // Update cargo status
+      cargo.status = 1;
+      await this.cargoRepository.update({ id: cargo.id }, cargo);
+
+      // Log updated cargo status
+      console.log('Cargo status after update:', cargo.status);
+
+      // Close RabbitMQ connection
+      await this.connection.close();
+
+      return new BpmResponse(true, null, null);
+    } catch (error: any) {
+      console.error(error);
+
+      // Close RabbitMQ connection in case of an error
+      if (this.connection) {
+        await this.connection.close();
+      }
+
+      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
