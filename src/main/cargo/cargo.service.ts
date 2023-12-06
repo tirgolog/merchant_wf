@@ -69,8 +69,8 @@ export class CargosService {
   }
 
   async getToken() {
-    await axios.post('http://192.168.1.218:7790/users/login', {phone: '998935421324'})
-    const testData = await axios.post('http://192.168.1.218:7790/users/codeverify', {phone: '998935421324', code: '00000'})
+    await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
+    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
     return testData.data?.token
   }
   
@@ -81,7 +81,7 @@ export class CargosService {
         return new BpmResponse(false, null, ['Merchant id is required !']);   
       }
       const token = await this.getToken();
-      const testData = await axios.get('http://192.168.1.218:7790/users/getAcceptedOrdersDriver', {
+      const testData = await axios.get('https://admin.tirgo.io/api/users/getAcceptedOrdersDriver', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
