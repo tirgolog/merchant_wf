@@ -7,6 +7,7 @@ import { UsersModule } from "./users/users.module";
 import { CargosModule } from "./cargo/cargo.module";
 import { TransactionsModule } from "./transaction/transaction.module";
 import { CargoTypesModule } from "./cargo-type/cargo-type.module";
+import { SharedModule } from "src/shared/modules/shared.module";
 
 @Module({
     imports: [
@@ -17,15 +18,16 @@ import { CargoTypesModule } from "./cargo-type/cargo-type.module";
         TransportTypesModule,
         CargosModule,
         CargoTypesModule,
-        TransactionsModule
+        TransactionsModule,
     ],
     controllers: [
     ],
     providers: [
     ],
     exports: [
+        CargosModule,
         UsersModule,
-        MerchantsModule
+        MerchantsModule,
     ]
 })
 export class MainModule {

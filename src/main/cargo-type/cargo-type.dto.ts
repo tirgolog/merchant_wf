@@ -9,6 +9,9 @@ export class CargoTypeDto {
 
   @IsNotEmpty()
   name: string;
+
+  @IsNotEmpty()
+  code: string;
   description?: string;
 
 }

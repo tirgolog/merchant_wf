@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    if (request.url == '/api/v1/auth/login' || request.url == '/api/v1/merchant') {
+    if (request.url == '/api/v1/auth/login' || request.url == '/api/v1/merchant' || request.url.startsWith('/api/v1/currency') || request.url == '/api/v1/cargo/all-driver') {
       return true;
     }
     const token = this.extractTokenFromHeader(request);

@@ -36,6 +36,7 @@ export class CargoTypesService {
     try {
       const role: CargoType = await this.cargoTypesRepository.create();
       role.name = createCargoTypeDto.name;
+      role.code = createCargoTypeDto.code;
 
       const newCargoType = await this.cargoTypesRepository.save(role);
       if (newCargoType) {

@@ -64,8 +64,8 @@ export class Cargo {
   @ManyToOne(() => User, (user) => user.cargo)
   createdBy?: string;
 
-  @Column({ default: 'Создан' })
-  status?: string;
+  @Column({ default: 0 })
+  status?: number;
 
   @Column({ default: true })
   active?: boolean;

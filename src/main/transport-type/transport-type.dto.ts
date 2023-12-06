@@ -9,6 +9,10 @@ export class TransportTypeDto {
 
   @IsNotEmpty()
   name: string;
+
+  @IsNotEmpty()
+  code: string;
+
   description?: string;
 
 }
