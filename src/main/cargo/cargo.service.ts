@@ -107,7 +107,7 @@ export class CargosService {
 
   async findCargoById(id: number) {
     try {
-      const data: any = await this.cargoRepository.findOne({
+      const data: any = await this.cargoRepository.findOneOrFail({
          where: { id, active: true },
          relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
         });
