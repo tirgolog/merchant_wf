@@ -14,7 +14,7 @@ import { HttpModule } from "@nestjs/axios";
     MainModule,
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET_KEY,
+      secret: 'jwt-merchant-secret-key',
       signOptions: { expiresIn: '3600s' },
     }),
   ],
