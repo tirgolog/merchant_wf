@@ -126,8 +126,7 @@ export class TransactionService {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(testData.data, 'balance')
-      const data = testData.data.data[0]
+      const data = testData.data.data;
       return new BpmResponse(true, { activeBalance: ((topupBalance - 500) - withdrowBalance) + data.totalActiveAmount, frozenBalance: data.totalFrozenAmount }, null)
     } catch (error) {
       this.logger.error(`Error while fetching merchant balance: ${error.message}`, error.stack);
