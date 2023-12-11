@@ -29,7 +29,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     const payload = { sub: user?.id, username: user.username, merchantId: user.merchant['id'] };
-    const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET_KEY })
+    const access_token = await this.jwtService.signAsync(payload, { secret: 'jwt-merchant-secret-key' })
     user.lastLogin = new Date();
     this.usersService.updateUser(user.id, user)
     return new BpmResponse(true,{ access_token: access_token}, null)
