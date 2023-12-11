@@ -67,6 +67,9 @@ export class Cargo {
   @Column({ default: 0 })
   status?: number;
 
+  @Column({ default: false })
+  isSafe?: boolean;
+
   @Column({ default: true })
   active?: boolean;
 }

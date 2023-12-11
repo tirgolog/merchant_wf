@@ -21,7 +21,7 @@ import { SharedModule } from './shared/modules/shared.module';
         host: 'localhost',
         port: 5432,
         username: 'postgres',
-        password: 'postgres',
+        password: '2000',
         database: 'merchant',
         entities: entities,
         synchronize: true,
