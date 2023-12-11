@@ -31,7 +31,7 @@ export class TransactionService {
 
   async getTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
       let data = await this.transactionsRepository.find({
@@ -49,7 +49,7 @@ export class TransactionService {
 
   async getVerifiedTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
       let data = await this.transactionsRepository.find({
@@ -67,7 +67,7 @@ export class TransactionService {
 
   async getRejetedTransactionsByMerchant(id: number): Promise<BpmResponse> {
     try {
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
       let data = await this.transactionsRepository.find({
@@ -85,7 +85,7 @@ export class TransactionService {
 
   async getTransactionsByUser(id: string): Promise<BpmResponse> {
     try {
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
       let data = await this.transactionsRepository.find({
@@ -102,33 +102,34 @@ export class TransactionService {
   }
 
   async getToken() {
-    await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
-    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
+    await axios.post('https://admin.tirgo.io/api/users/login', { phone: '998935421324' })
+    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', { phone: '998935421324', code: '00000' })
     return testData.data?.token
   }
 
   async getMerchantBalance(id: number): Promise<BpmResponse> {
     try {
 
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Merchant is required']);
       }
       let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup', verified: true }, relations: ['merchant'] });
       topup = topup.filter((el: any) => el.merchant?.id == id)
       let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow', verified: true }, relations: ['merchant'] });
       withdrow = withdrow.filter((el: any) => el.merchant?.id == id)
-      
+
       const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
       const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
       const token = await this.getToken();
-      const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId='+id, {
+      const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId=' + id, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(testData.data, 'balance')
       const data = testData.data.data[0]
-      return new BpmResponse(true, { activeBalance: ((topupBalance - 500) - withdrowBalance ) + data.totalActiveAmount, frozenBalance: data.totalFrozenAmount }, null)
-    } catch(error) {
+      return new BpmResponse(true, { activeBalance: ((topupBalance - 500) - withdrowBalance) + data.totalActiveAmount, frozenBalance: data.totalFrozenAmount }, null)
+    } catch (error) {
       this.logger.error(`Error while fetching merchant balance: ${error.message}`, error.stack);
       throw new CustomHttpException('Error while fetching merchant balance', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
@@ -137,7 +138,7 @@ export class TransactionService {
   async findTransactionById(id: string): Promise<BpmResponse> {
     try {
       const data = await this.transactionsRepository.findOne({ where: { id, active: true } });
-      if(data) {
+      if (data) {
         return new BpmResponse(true, data, null);
       } else {
         return new BpmResponse(false, null, ['Not found']);
@@ -169,7 +170,7 @@ export class TransactionService {
   async verifyTransaction(id: string): Promise<BpmResponse> {
     try {
       const transaction: Transaction = await this.transactionsRepository.findOneBy({ id, active: true, rejected: false });
-      if(!transaction) {
+      if (!transaction) {
         return new BpmResponse(false, null, ['Transaction not found']);
       }
       transaction.verified = true;
@@ -187,7 +188,7 @@ export class TransactionService {
   async rejectTransaction(id: string): Promise<BpmResponse> {
     try {
       const transaction: Transaction = await this.transactionsRepository.findOneBy({ id, active: true, verified: false });
-      if(!transaction) {
+      if (!transaction) {
         return new BpmResponse(false, null, ['Transaction not found']);
       }
       transaction.rejected = true;
@@ -222,7 +223,7 @@ export class TransactionService {
 
   async deleteTransaction(id: string): Promise<BpmResponse> {
     try {
-      if(!id) {
+      if (!id) {
         return new BpmResponse(false, null, ['Id is required']);
       }
       const isDeleted = await this.transactionsRepository.createQueryBuilder()
@@ -236,9 +237,9 @@ export class TransactionService {
         return new BpmResponse(true, 'Delete failed', null);
       }
     }
-    catch(error: any) {
+    catch (error: any) {
       this.logger.error(`Error while deleting transaction: ${error.message}`, error.stack);
       throw new CustomHttpException('Error while deleting transaction', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
     }
-    } 
+  }
 }
