@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Put, Req, Query, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CargosService } from "./cargo.service";
-import { CargoDto } from "./cargo.dto";
+import { AcceptCargoDto, CargoDto } from "./cargo.dto";
 import { Request } from "express";
 
 @Controller('api/v1/cargo')
@@ -37,7 +37,7 @@ export class CargoController {
 
   @Post('accept-offer')
   @UsePipes(ValidationPipe)
-  async acceptOffer(@Body() acceptCargoDto: any, @Req() req: Request) {
+  async acceptOffer(@Body() acceptCargoDto: AcceptCargoDto, @Req() req: Request) {
     return this.cargosService.acceptCargo(acceptCargoDto, req['user']?.id);
   }
 

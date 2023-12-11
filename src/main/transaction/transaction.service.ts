@@ -5,7 +5,7 @@ import { BpmResponse } from '..';
 import { Transaction } from './transaction.entity';
 import { TransactionDto } from './transaction.dto';
 import { CustomHttpException } from 'src/shared/exceptions/custom-http-exception';
-
+import axios from 'axios';
 @Injectable()
 export class TransactionService {
 
@@ -101,6 +101,12 @@ export class TransactionService {
     }
   }
 
+  async getToken() {
+    await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
+    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
+    return testData.data?.token
+  }
+
   async getMerchantBalance(id: number): Promise<BpmResponse> {
     try {
 
@@ -114,7 +120,14 @@ export class TransactionService {
       
       const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
       const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
-      return new BpmResponse(true, { topup: topupBalance - 500, withdrow: withdrowBalance }, null)
+      const token = await this.getToken();
+      const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId='+id, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = testData.data.data[0]
+      return new BpmResponse(true, { activeBalance: ((topupBalance - 500) - withdrowBalance ) + data.totalActiveAmount, frozenBalance: data.totalFrozenAmount }, null)
     } catch(error) {
       this.logger.error(`Error while fetching merchant balance: ${error.message}`, error.stack);
       throw new CustomHttpException('Error while fetching merchant balance', HttpStatus.INTERNAL_SERVER_ERROR, error.message);

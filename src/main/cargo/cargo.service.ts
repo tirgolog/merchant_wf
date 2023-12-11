@@ -138,6 +138,7 @@ export class CargosService {
       cargo.isDangrousCargo = createCargoDto.isDangrousCargo || null;
       cargo.isCashlessPayment = createCargoDto.isCashlessPayment || null;
       cargo.isUrgent = createCargoDto.isUrgent || null;
+      cargo.isSafe = createCargoDto.isSafe || false;
       cargo.createdBy = userId;
 
 
@@ -211,6 +212,7 @@ export class CargosService {
       cargo.isDangrousCargo = updateCargoDto.isDangrousCargo || cargo.isDangrousCargo;
       cargo.isCashlessPayment = updateCargoDto.isCashlessPayment || cargo.isCashlessPayment;
       cargo.isUrgent = updateCargoDto.isUrgent || cargo.isUrgent;
+      cargo.isUrgent = updateCargoDto.isSafe || cargo.isSafe;
 
       const updatedCargo = await this.cargoRepository.save(cargo)
       if (updatedCargo) {

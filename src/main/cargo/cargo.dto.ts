@@ -31,6 +31,8 @@ export class CargoDto {
 
   @IsUUID()
   currencyId?: string;
+
+  isSafe?: boolean;
   offeredPrice?: number;
   cargoWeight?: number;
   cargoLength?: number;
@@ -39,5 +41,26 @@ export class CargoDto {
   isDangrousCargo?: boolean;
   isCashlessPayment?: boolean
   isUrgent?: boolean;
+
+}
+
+export class AcceptCargoDto {
+  @IsNotEmpty()
+  orderId: number;
+
+  @IsNotEmpty()
+  clientId: number;
+
+  @IsNotEmpty()
+  driverId: number;
+
+  @IsNotEmpty()
+  amount: number;
+
+  @IsNotEmpty()
+  isSafe: boolean;
+
+  @IsNotEmpty()
+  additionalAmount: number;
 
 }
