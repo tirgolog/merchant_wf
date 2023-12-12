@@ -164,7 +164,7 @@ export class CargosService {
 
       // Update cargo status in the database
       console.log(createCargoDto)
-      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: createCargoDto.orderid } });
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: createCargoDto.orderId } });
       console.log('Cargo status before update:', cargo.status);
 
       // Update cargo status
