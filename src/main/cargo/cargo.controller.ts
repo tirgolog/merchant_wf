@@ -35,6 +35,12 @@ export class CargoController {
     return this.cargosService.createCargo(createCargoDto, req['user']?.id);
   }
 
+  @Post('find-city')
+  @UsePipes(ValidationPipe)
+  async findCity(@Body() createCargoDto: any, @Req() req: Request) {
+    return this.cargosService.findCity(createCargoDto);
+  }
+
   @Post('accept-offer')
   @UsePipes(ValidationPipe)
   async acceptOffer(@Body() acceptCargoDto: AcceptCargoDto, @Req() req: Request) {

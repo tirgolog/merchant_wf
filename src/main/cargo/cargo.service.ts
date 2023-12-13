@@ -73,6 +73,16 @@ export class CargosService {
     const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
     return testData.data?.token
   }
+
+  async findCity(body: any) {
+    const token = await this.getToken();
+    const testData = await axios.post('https://admin.tirgo.io/api/users/findCity', {query: body.query},{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    return new BpmResponse(true, testData.data.data, null);
+  }
   
 
   async getMerchantCargos(id: number) {
