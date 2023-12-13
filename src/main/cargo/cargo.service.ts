@@ -140,6 +140,10 @@ export class CargosService {
       cargo.isUrgent = createCargoDto.isUrgent || null;
       cargo.isSafe = createCargoDto.isSafe || false;
       cargo.createdBy = userId;
+      cargo.start_lat = createCargoDto.start_lat;
+      cargo.start_lng =  createCargoDto.start_lng;
+      cargo.finish_lat =  createCargoDto.finish_lat;
+      cargo.finish_lng =  createCargoDto.finish_lng;
 
 
       const newCargo = await this.cargoRepository.save(cargo);

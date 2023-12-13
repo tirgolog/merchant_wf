@@ -32,6 +32,11 @@ export class CargoDto {
   @IsUUID()
   currencyId?: string;
 
+  start_lat?: string;
+  start_lng?: string;
+  finish_lat?: string;
+  finish_lng?: string;
+
   isSafe?: boolean;
   offeredPrice?: number;
   cargoWeight?: number;

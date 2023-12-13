@@ -55,6 +55,18 @@ export class Cargo {
   @Column({ nullable: true })
   isUrgent?: boolean;
 
+  @Column({ nullable: true })
+  start_lat?: string;
+
+  @Column({ nullable: true })
+  start_lng?: string;
+
+  @Column({ nullable: true })
+  finish_lat?: string;
+
+  @Column({ nullable: true })
+  finish_lng?: string;
+
   @Column({ default: new Date() })
   createdAt?: Date;
 
