@@ -43,7 +43,7 @@ export class CargoController {
 
   @Put('finish-cargo')
   @UsePipes(ValidationPipe)
-  async finishCargo(@Body() finishCargoDto: AcceptCargoDto, @Req() req: Request) {
+  async finishCargo(@Body() finishCargoDto: any, @Req() req: Request) {
     return this.cargosService.acceptCargo(finishCargoDto, req['user']?.id);
   }
 
