@@ -199,7 +199,8 @@ export class CargosService {
     try {
       // Update cargo status in the database
       console.log(finishCargoDto)
-      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: finishCargoDto.orderId } });
+      const orderId = finishCargoDto.orderId.toString().split('M')[1] ? finishCargoDto.orderId.toString().split('M')[1] : finishCargoDto.orderId;
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: orderId } });
       console.log('Cargo status before update:', cargo.status);
 
       // Update cargo status
@@ -208,7 +209,6 @@ export class CargosService {
 
       // Log updated cargo status
       console.log('Cargo status after update:', cargo.status);
-      const orderId = finishCargoDto.id.toString().split('M')[1] ? finishCargoDto.id.toString().split('M')[1] : finishCargoDto.id
       const token = await this.getToken();
       const testData = await axios.post('https://admin.tirgo.io/api/users/finish-merchant-cargo', { orderId }, {
         headers: {
