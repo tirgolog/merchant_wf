@@ -32,9 +32,16 @@ export class CargoDto {
   @IsUUID()
   currencyId?: string;
 
+  @IsNotEmpty()
   start_lat?: string;
+
+  @IsNotEmpty()
   start_lng?: string;
+
+  @IsNotEmpty()
   finish_lat?: string;
+
+  @IsNotEmpty()
   finish_lng?: string;
 
   isSafe?: boolean;
@@ -68,4 +75,9 @@ export class AcceptCargoDto {
   @IsNotEmpty()
   additionalAmount: number;
 
+}
+
+export class FinishCargoDto {
+  @IsNotEmpty()
+  orderId: number;
 }

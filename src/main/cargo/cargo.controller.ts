@@ -41,6 +41,12 @@ export class CargoController {
     return this.cargosService.acceptCargo(acceptCargoDto, req['user']?.id);
   }
 
+  @Put('finish-cargo')
+  @UsePipes(ValidationPipe)
+  async finishCargo(@Body() finishCargoDto: AcceptCargoDto, @Req() req: Request) {
+    return this.cargosService.acceptCargo(finishCargoDto, req['user']?.id);
+  }
+
   @Put()
   @UsePipes(ValidationPipe)
   async update(@Query('id') id: number, @Body() updateCargoDto: CargoDto) {
