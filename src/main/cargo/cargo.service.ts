@@ -194,6 +194,41 @@ export class CargosService {
     }
   }
 
+  
+  async finishMerchantCargo(finishCargoDto: any, userId: string) {
+    try {
+      // Update cargo status in the database
+      console.log(finishCargoDto)
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: finishCargoDto.orderId } });
+      console.log('Cargo status before update:', cargo.status);
+
+      // Update cargo status
+      cargo.status = 3;
+      await this.cargoRepository.update({ id: cargo.id }, cargo);
+
+      // Log updated cargo status
+      console.log('Cargo status after update:', cargo.status);
+      const orderId = finishCargoDto.id.toString().split('M')[1] ? finishCargoDto.id.toString().split('M')[1] : finishCargoDto.id
+      const token = await this.getToken();
+      const testData = await axios.post('https://admin.tirgo.io/api/users/finish-merchant-cargo', { orderId }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      return new BpmResponse(true, null, null);
+    } catch (error: any) {
+      console.error(error);
+
+      // Close RabbitMQ connection in case of an error
+      if (this.connection) {
+        await this.connection.close();
+      }
+
+      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async updateCargo(id: number, updateCargoDto: CargoDto): Promise<BpmResponse> {
     try {
 
