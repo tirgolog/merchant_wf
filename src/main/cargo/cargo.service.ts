@@ -198,7 +198,6 @@ export class CargosService {
   async finishMerchantCargo(finishCargoDto: any, userId: string) {
     try {
       // Update cargo status in the database
-      console.log(finishCargoDto)
       const orderId = finishCargoDto.orderId.toString().split('M')[1] ? finishCargoDto.orderId.toString().split('M')[1] : finishCargoDto.orderId;
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id: orderId } });
       console.log('Cargo status before update:', cargo.status);
