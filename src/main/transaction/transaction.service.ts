@@ -127,7 +127,7 @@ export class TransactionService {
         },
       });
       const data = testData.data.data;
-      return new BpmResponse(true, { activeBalance: (((topupBalance - 500) - withdrowBalance) - data.totalFrozenAmount), frozenBalance: data.totalFrozenAmount }, null)
+      return new BpmResponse(true, { activeBalance: ((((topupBalance - 500) - withdrowBalance) - data.totalFrozenAmount) - data.totalRemovalAmount), frozenBalance: data.totalFrozenAmount }, null)
     } catch (error) {
       this.logger.error(`Error while fetching merchant balance: ${error.message}`, error.stack);
       throw new CustomHttpException('Error while fetching merchant balance', HttpStatus.INTERNAL_SERVER_ERROR, error.message);
