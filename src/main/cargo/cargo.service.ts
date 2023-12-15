@@ -212,10 +212,7 @@ export class CargosService {
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id: orderId } });
       console.log('Cargo status before update:', cargo.status);
 
-      // Update cargo status
-      cargo.status = 3;
-      await this.cargoRepository.update({ id: cargo.id }, cargo);
-
+      
       // Log updated cargo status
       console.log('Cargo status after update:', cargo.status);
       const token = await this.getToken();
@@ -224,6 +221,12 @@ export class CargosService {
           Authorization: `Bearer ${token}`,
         },
       })
+
+      if(testData.data?.status) {
+        // Update cargo status
+        cargo.status = 3;
+        await this.cargoRepository.update({ id: cargo.id }, cargo);
+      }
 
       return new BpmResponse(true, null, null);
     } catch (error: any) {
