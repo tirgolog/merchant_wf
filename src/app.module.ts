@@ -8,6 +8,8 @@ import entities from './main/index';
 import { AuthModule } from './shared/modules/auth.module';
 import { FileUploadModule } from './shared/modules/file-upload.module';
 import { SharedModule } from './shared/modules/shared.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { multerConfig } from './shared/multer.config';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { SharedModule } from './shared/modules/shared.module';
         host: 'localhost',
         port: 5432,
         username: 'postgres',
-        password: 'postgres',
+        password: '2000',
         database: 'merchant',
         entities: entities,
         synchronize: true,
@@ -33,7 +35,8 @@ import { SharedModule } from './shared/modules/shared.module';
     MainModule,
     AuthModule,
     FileUploadModule,
-    SharedModule
+    SharedModule,
+    MulterModule.register(multerConfig)
   ],
   controllers: [AppController],
   providers: [
