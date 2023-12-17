@@ -12,4 +12,7 @@ export const multerConfig = {
       callback(null, `${file.fieldname}-${uniqueSuffix}${extension}`);
     },
   }),
+  limits: {
+    fileSize: 1024 * 1024 * 5, // 5 MB (adjust the limit as needed)
+  },
 };

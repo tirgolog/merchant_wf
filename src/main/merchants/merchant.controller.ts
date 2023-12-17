@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Put, Query, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Patch, Post, Put, Query, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { MerchantDto } from "./merchant.dto";
 import { MerchantService } from "./merchant.service";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -32,13 +32,12 @@ export class MerchantController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async create(@Body() createMerchantDto: MerchantDto) {
-     return this.merchantsService.createMerchant(createMerchantDto);
+  async create(@Body() createMerchantDto: any) {
+    return this.merchantsService.createMerchant(createMerchantDto);
   }
 
   @Put()
   @UsePipes(ValidationPipe)
-  // @UseInterceptors(FileInterceptor('file', multerConfig))
   async update(@Query('id') id: number, @Body() updateMerchantDto: MerchantDto) {
     return this.merchantsService.updateMerchant(id, updateMerchantDto);
   }
