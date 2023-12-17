@@ -19,7 +19,7 @@ export class FileUploadController {
   @Get('download/:filename')
   async downloadFile(@Param('filename') filename: string, @Res() res: Response): Promise<void> {
     const filePath = path.join(process.cwd(), '/uploads/', filename);
-
+    
     // Check if the file exists
     if (!fs.existsSync(filePath)) {
       res.status(HttpStatus.NOT_FOUND).send('File not found');
