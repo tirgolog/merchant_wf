@@ -6,6 +6,7 @@ import { Transaction } from './transaction.entity';
 import { TransactionDto } from './transaction.dto';
 import { CustomHttpException } from 'src/shared/exceptions/custom-http-exception';
 import axios from 'axios';
+import { SseGateway } from 'src/shared/gateway/sse.gateway';
 @Injectable()
 export class TransactionService {
 
@@ -13,6 +14,7 @@ export class TransactionService {
 
   constructor(
     @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>,
+    private eventsService: SseGateway
   ) { }
 
   async getTransactions(): Promise<BpmResponse> {
@@ -175,6 +177,7 @@ export class TransactionService {
       transaction.verified = true;
       const updatedTransaction = await this.transactionsRepository.save(transaction)
       if (updatedTransaction) {
+        this.eventsService.sendVerifiedTransction('1')
         return new BpmResponse(true, 'Verified', null);
       }
 

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node", "socket.io"],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
