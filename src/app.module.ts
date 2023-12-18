@@ -23,7 +23,7 @@ import { multerConfig } from './shared/multer.config';
         host: 'localhost',
         port: 5432,
         username: 'postgres',
-        password: '2000',
+        password: 'postgres',
         database: 'merchant',
         entities: entities,
         synchronize: true,
