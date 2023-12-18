@@ -6,11 +6,13 @@ import { Cargo } from './cargo.entity';
 import { CargoDto } from './cargo.dto';
 import axios from 'axios';
 import * as amqp from 'amqplib';
+import { SseGateway } from 'src/shared/gateway/sse.gateway';
 
 @Injectable()
 export class CargosService {
   constructor(
     @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
+    private eventsServcie: SseGateway
     // private readonly rabbitMQService: RabbitMQService
   ) { }
 
@@ -190,7 +192,7 @@ export class CargosService {
 
       // Close RabbitMQ connection
       await this.connection.close();
-
+      this.eventsServcie.sendUpdateBalance('1')
       return new BpmResponse(true, null, null);
     } catch (error: any) {
       console.error(error);

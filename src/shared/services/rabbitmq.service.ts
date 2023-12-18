@@ -3,6 +3,7 @@
 import { Inject, Injectable, OnModuleInit, forwardRef } from '@nestjs/common';
 import * as amqp from 'amqplib';
 import { CargosService } from 'src/main/cargo/cargo.service';
+import { SseGateway } from '../gateway/sse.gateway';
 
 @Injectable()
 export class RabbitMQService implements OnModuleInit {
@@ -10,7 +11,8 @@ export class RabbitMQService implements OnModuleInit {
   private channel: amqp.Channel;
 
   constructor(
-    private readonly cargosService: CargosService
+    private readonly cargosService: CargosService,
+    private eventService: SseGateway
     ) {}
 
   async onModuleInit() {
@@ -38,7 +40,7 @@ export class RabbitMQService implements OnModuleInit {
       try {
         const data = JSON.parse(messageContent);
         console.log(`Received message finishOrderDriver: ${JSON.stringify(data)}`);
-        
+        this.eventService.sendDriverFinish('1')
         // Process the message using CargosService
         await this.cargosService.finishCargo(data);
       } catch (error) {

@@ -20,7 +20,10 @@ export class AuthGuard implements CanActivate {
     if (request.url == '/api/v1/auth/login' || request.url == '/api/v1/merchant' || request.url.startsWith('/api/v1/currency') || request.url.startsWith('/api/v1/file') || request.url == '/api/v1/cargo/all-driver' || request.url.startsWith('/api/v1/cargo/id')) {
       return true;
     }
-    const token = this.extractTokenFromHeader(request);
+    let token = this.extractTokenFromHeader(request);
+    if(request.url.startsWith('/sse/events')) {
+    token = request.query.token
+    }
     if (!token) {
       throw new UnauthorizedException();
     }
