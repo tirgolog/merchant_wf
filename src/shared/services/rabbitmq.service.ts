@@ -57,7 +57,7 @@ export class RabbitMQService implements OnModuleInit {
       try {
         const data = messageContent;
         console.log(`Received message acceptOrderDriver: ${JSON.stringify(data)}`);
-        
+        this.eventService.sendDriverOffer('1')
         // Process the message using CargosService
         
       } catch (error) {
