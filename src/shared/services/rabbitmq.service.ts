@@ -75,7 +75,7 @@ export class RabbitMQService implements OnModuleInit {
         console.log(`Received message acceptAdminAppendOrder: ${JSON.stringify(data)}`);
         
         // Process the message using CargosService
-        await this.cargosService.finishCargo(data);
+        await this.cargosService.appendCargo(data);
         
       } catch (error) {
         console.error('Error parsing message acceptAdminAppendOrder:', error);
