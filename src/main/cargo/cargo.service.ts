@@ -73,6 +73,7 @@ export class CargosService {
   async appendCargo(id: number): Promise<BpmResponse> {
     try {
       // Perform cargo finishing logic
+      console.log('Append cargo: ', id)
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
       cargo.status = 1; 
       await this.cargoRepository.save(cargo);
