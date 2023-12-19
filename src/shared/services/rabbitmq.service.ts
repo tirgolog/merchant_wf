@@ -26,12 +26,14 @@ export class RabbitMQService implements OnModuleInit {
     await this.channel.assertQueue('acceptDriverOffer');
     await this.channel.assertQueue('finishOrderDriver');
     await this.channel.assertQueue('acceptOrderDriver');
+    await this.channel.assertQueue('acceptAdminAppendOrder');
   }
 
   private async setupQueueConsumers() {
     // Consume messages from 'finishOrderDriver' queue
     this.channel.consume('finishOrderDriver', this.handleFinishOrderMessage.bind(this), { noAck: true });
     this.channel.consume('acceptOrderDriver', this.handleAcceptOrderDriverMessage.bind(this), { noAck: true });
+    this.channel.consume('acceptAdminAppendOrder', this.handleAdminAppendOrder.bind(this), { noAck: true });
   }
 
   private async handleFinishOrderMessage(msg: amqp.ConsumeMessage | null) {
@@ -60,6 +62,23 @@ export class RabbitMQService implements OnModuleInit {
         
       } catch (error) {
         console.error('Error parsing message acceptOrderDriver:', error);
+      }
+    }
+  }
+
+
+  private async handleAdminAppendOrder(msg: amqp.ConsumeMessage | null) {
+    if (msg) {
+      const messageContent = msg.content.toString();
+      try {
+        const data = JSON.parse(messageContent);;
+        console.log(`Received message acceptAdminAppendOrder: ${JSON.stringify(data)}`);
+        
+        // Process the message using CargosService
+        await this.cargosService.finishCargo(data);
+        
+      } catch (error) {
+        console.error('Error parsing message acceptAdminAppendOrder:', error);
       }
     }
   }

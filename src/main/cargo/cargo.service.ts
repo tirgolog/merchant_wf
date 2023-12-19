@@ -70,6 +70,20 @@ export class CargosService {
     }
   }
 
+  async appendCargo(id: number): Promise<BpmResponse> {
+    try {
+      // Perform cargo finishing logic
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
+      cargo.status = 1; 
+      await this.cargoRepository.save(cargo);
+
+      return new BpmResponse(true, null, null);
+    } catch (error: any) {
+      console.error(error);
+      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getToken() {
     await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
     const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
