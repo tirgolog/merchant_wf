@@ -10,6 +10,7 @@ import { FileUploadModule } from './shared/modules/file-upload.module';
 import { SharedModule } from './shared/modules/shared.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerConfig } from './shared/multer.config';
+import { SocketGateway } from './shared/gateway/socket.gateway';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { multerConfig } from './shared/multer.config';
     AuthModule,
     FileUploadModule,
     SharedModule,
-    MulterModule.register(multerConfig)
+    MulterModule.register(multerConfig),
+    SocketGateway
   ],
   controllers: [AppController],
   providers: [
