@@ -20,8 +20,8 @@ export class CargoController {
   }
 
   @Get('all-driver')
-  async getAllDriverCargos() {
-    return this.cargosService.getDriverCargos();
+  async getAllDriverCargos(@Query('secure') secure: boolean) {
+    return this.cargosService.getDriverCargos(secure);
   }
 
   @Get('merchant')
