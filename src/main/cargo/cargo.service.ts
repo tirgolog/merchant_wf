@@ -36,10 +36,17 @@ export class CargosService {
     }
   }
 
-  async getDriverCargos() {
+  async getDriverCargos(secure: boolean) {
     try {
+      const isSafe = secure == true ? !!secure : false;
+      let filter: any = {};
+      if(isSafe) {
+        filter = { active: true, isSafe }
+      } else {
+        filter = { active: true }
+      }
       const data: any = await this.cargoRepository.find({
-        where: { active: true },
+        where: filter,
         relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportType']
       });
       data.forEach((el: any) => {
