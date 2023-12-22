@@ -57,7 +57,6 @@ export class MerchantService {
         const rawTransactions = transactions.filter((el: any) => el.merchant['id'] == data[i]?.id);
         const topup = rawTransactions.filter((el: any) => el.transactionType == 'topup').reduce((a: any, b: any) => a + b.amount, 0);
         const withdraw = rawTransactions.filter((el: any) => el.transactionType == 'withdrow').reduce((a: any, b: any) => a + b.amount, 0);
-        data[i].balance = (topup - 500) - withdraw;
       }
       return new BpmResponse(true, data, null);
     }
