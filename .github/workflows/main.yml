@@ -1,12 +1,10 @@
-name: CICD
-
 on:
   push:
     branches: [github-actions]
 
 jobs:
   build:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -14,8 +12,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-        
           node-version: 14
+
       - name: Install dependencies
         run: npm install --force
 
@@ -26,19 +24,23 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        # Assuming Dockerfile is in the root of your project
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/merchant-wf .
 
-      - name: Publish image to Docker Hub
+      - name: Push image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
 
   deploy:
     needs: build
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
-      - name: Pull image from Docker Hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
-      - name: Delete old container (if exists)
-        run: docker rm -f merchant-wf-container || true
-      - name: Run Docker container
-        run: docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
+      - name: Install SSH key
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to AWS EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ ${{ secrets.SEVER_IP }} 'bash -s' << EOF
+            docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
+            docker stop merchant-wf-container || true
+            docker rm merchant-wf-container || true
+            docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
+          EOF
