@@ -21,14 +21,10 @@ jobs:
       - name: Build the application
         run: npm run build
       
-         - name: Debugging Output
-          run: |
-            ls -l
-            ls -l dist
-            npm run build
-          env:
-            NODE_ENV: development
-
+      - name: Debugging Output
+        run: |
+          ls -l
+          ls -l dist
 
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
