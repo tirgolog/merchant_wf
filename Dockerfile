@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Build the NestJS application
+RUN npm run build
+
 # Copy the built application files to the container
 COPY dist/ .
 
