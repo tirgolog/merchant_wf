@@ -41,10 +41,10 @@ jobs:
 
       - name: Deploy to AWS EC2
         run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.SERVER_IP }} 'bash -s' << EOF
-          docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
-          docker stop merchant-wf-container || true
-          docker rm merchant-wf-container || true
-          docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
-        EOF
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.SERVER_IP }} 'bash -s' << EOF
+            docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
+            docker stop merchant-wf-container || true
+            docker rm merchant-wf-container || true
+            docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
+          EOF
 
