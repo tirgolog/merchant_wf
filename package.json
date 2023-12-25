@@ -30,6 +30,7 @@
     "@nestjs/platform-socket.io": "^10.3.0",
     "@nestjs/platform-ws": "^10.2.10",
     "@nestjs/typeorm": "^10.0.1",
+    "@nestjs/websockets": "^10.3.0",
     "@types/socket.io": "^3.0.2",
     "amqplib": "^0.10.3",
     "axios": "^1.6.2",
