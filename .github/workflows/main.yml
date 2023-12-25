@@ -8,6 +8,13 @@ jobs:
   build:
     runs-on: [ubuntu-latest]
     steps:
+      - name: Debugging Output
+        run: |
+          ls -l node_modules/.bin
+          npm run build
+        env:
+          NODE_ENV: development
+          
       - name: Checkout source
         uses: actions/checkout@v3
      
