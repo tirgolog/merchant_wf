@@ -29,21 +29,22 @@ jobs:
       - name: Push image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create SSH directory
-        run: mkdir -p ~/.ssh
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Create SSH directory
+      run: mkdir -p ~/.ssh
 
-      - name: Install SSH key
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+    - name: Install SSH key
+      run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
 
-      - name: Deploy to AWS EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@ ${{ secrets.SEVER_IP }} 'bash -s' << EOF
-            docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
-            docker stop merchant-wf-container || true
-            docker rm merchant-wf-container || true
-            docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
-          EOF
+    - name: Deploy to AWS EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.SERVER_IP }} 'bash -s' << EOF
+          docker pull ${{ secrets.DOCKER_USERNAME }}/merchant-wf:latest
+          docker stop merchant-wf-container || true
+          docker rm merchant-wf-container || true
+          docker run -d -p 3000:3000 --name merchant-wf-container ${{ secrets.DOCKER_USERNAME }}/merchant-wf
+        EOF
+
