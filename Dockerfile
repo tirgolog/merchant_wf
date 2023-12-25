@@ -13,8 +13,11 @@ RUN npm install
 # Build the NestJS application
 RUN npm run build
 
+# Print the contents of the /app directory for debugging
+RUN ls -al /app
+
 # Copy the built application files to the container
-COPY ./dist/ .
+COPY dist/ .
 
 # Expose the port on which the application will run
 EXPOSE 3000
