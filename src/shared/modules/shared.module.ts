@@ -5,9 +5,14 @@ import { CargosModule } from 'src/main/cargo/cargo.module';
 import { SseController } from '../controllers/sse/sse.controller';
 import { SseGateway } from '../gateway/sse.gateway';
 import { MailService } from '../services/mail.service';
+import { Config } from '../entities/config.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [forwardRef(() => CargosModule)],
+  imports: [
+    forwardRef(() => CargosModule),
+    TypeOrmModule.forFeature([Config]),
+  ],
   providers: [
     RabbitMQService,
     SseGateway,
@@ -16,7 +21,8 @@ import { MailService } from '../services/mail.service';
   exports: [
     RabbitMQService,
     SseGateway,
-    MailService
+    MailService,
+    TypeOrmModule.forFeature([Config]),
   ],
   controllers: [SseController]
 })

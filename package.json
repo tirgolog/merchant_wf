@@ -42,6 +42,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
+    "request-promise": "^4.2.6",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "socket.io": "^4.7.2",
