@@ -46,6 +46,12 @@ export class User {
   @Column({ default: new Date() })
   lastLogin?: Date;
 
+  @Column({ nullable: true })
+  resetPasswordCodeSentDate?: number;
+
+  @Column({ nullable: true })
+  resetPasswordCode?: string;
+
   @Column({ default: true })
   active?: boolean;
   

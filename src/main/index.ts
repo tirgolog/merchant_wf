@@ -50,6 +50,7 @@ export enum ResponseStauses {
   SuccessfullyUpdated = 'Data successfully updated',
   SuccessfullyDeleted = 'Data successfully deleted',
   CreateDataFailed = 'Create data failed',
+  SendCodeFailed = 'Send code failed',
   UpdateDataFailed = 'Update data falied',
   DeleteDataFailed = 'Delete data falied',
   ExistingData = 'Existing data',
