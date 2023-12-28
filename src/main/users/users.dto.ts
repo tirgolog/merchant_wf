@@ -53,3 +53,11 @@ export class VerifyCodeDto {
   @IsNotEmpty()
   code: string;
 }
+
+export class VerifyPhoneDto {
+  @IsNotEmpty()
+  phone: string;
+
+  @IsNotEmpty()
+  countryCode: string;
+}

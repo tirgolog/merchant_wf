@@ -66,16 +66,16 @@ export class SmsService {
         console.log(rp_res);
         return rp_res.status;
       }
+      return true;
     } catch (err) {
-      return false;
+      throw Error
     } finally {
     }
   }
 
-  async sendSmsLocal(phone, code, country_code) {
+  async sendSmsLocal(phone, code) {
     console.log('local sms', phone);
     console.log('local sms', code);
-    console.log('local sms', country_code);
     let options = {
       method: "POST",
       uri: "http://91.204.239.44/broker-api/send",
@@ -107,10 +107,32 @@ export class SmsService {
         return false;
       }
     } catch (err) {
-      return false;
+      throw Error
     } finally {
       console.log("finally");
     }
   }
   
+  async sendSmsRu(phone, code) {
+    try {
+      let options = {
+        method: "GET",
+        uri:
+          "http://api.iqsms.ru/messages/v2/send/?phone=" +
+          phone +
+          "&text=Confirmation code " +
+          code,
+        json: false,
+        headers: {
+          Authorization:
+            "Basic " + Buffer.from("tirgo1:TIRGOSMS").toString("base64"),
+        },
+      };
+      await rp(options);
+      return true;
+    } catch(err: any) {
+      console.log(err);
+      throw Error
+    }
+  }
 }

@@ -7,6 +7,7 @@ import { SseGateway } from '../gateway/sse.gateway';
 import { MailService } from '../services/mail.service';
 import { Config } from '../entities/config.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SmsService } from '../services/sms.service';
 
 @Module({
   imports: [
@@ -16,12 +17,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [
     RabbitMQService,
     SseGateway,
-    MailService
+    MailService,
+    SmsService
   ],
   exports: [
     RabbitMQService,
     SseGateway,
     MailService,
+    SmsService,
     TypeOrmModule.forFeature([Config]),
   ],
   controllers: [SseController]
