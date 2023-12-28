@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "src/shared/guards/auth/auth.guard";
 import { BpmResponse, ResponseStauses } from "..";
-import { CreateUserDto, UpdateUserDto } from "./users.dto";
+import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto } from "./users.dto";
 import { UsersService } from "./users.service";
 
 @Controller('api/v1/users')
@@ -57,6 +57,18 @@ export class UsersController {
         bpmResponse = new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
       }
       return bpmResponse;
+    }
+
+    @Post('send-code')
+    @UsePipes(ValidationPipe)
+    async sendCode(@Body() sendCodeDto: SendCodeDto) {
+      return this.usersService.sendMailToResetPassword(sendCodeDto);
+    }
+
+    @Post('verify-code')
+    @UsePipes(ValidationPipe)
+    async verifyCode(@Body() sendCodeDto: VerifyCodeDto) {
+      return this.usersService.verifyResetPasswordCode(sendCodeDto);
     }
 
     @Patch('password')

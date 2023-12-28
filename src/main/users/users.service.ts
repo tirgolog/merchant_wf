@@ -2,14 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, UpdateUserDto } from './users.dto';
+import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto } from './users.dto';
 import * as bcrypt from 'bcrypt';
-import { BpmResponse } from '..';
+import { BpmResponse, ResponseStauses } from '..';
+import { MailService } from 'src/shared/services/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private mailService: MailService
   ) { }
 
   async getUsers() {
@@ -120,4 +122,62 @@ export class UsersService {
       return new BpmResponse(true, null, ['Updated'])
     }
   }
+
+  async sendMailToResetPassword(sendCodeDto: SendCodeDto) {
+    const code = await this.generateRoomCode();
+    let bpmResponse;
+    try {
+      const user = await this.usersRepository.findOneOrFail({ where: { username: sendCodeDto.email, active: true } });
+      if(user) {
+        const info = await this.mailService.sendMail(sendCodeDto.email, 'Verification code', code)
+        const timestamp = Date.now(); // Capture the timestamp when the code is generated
+        const expirationTime = 3 * 60 * 1000; // 3 minutes in milliseconds
+        console.log('Message sent: %s', info.messageId);
+        user.resetPasswordCode = code;
+        user.resetPasswordCodeSentDate = timestamp + expirationTime;
+        this.usersRepository.update({ id: user.id }, user);
+        bpmResponse = new BpmResponse(true, null);
+      } else {
+        bpmResponse = new BpmResponse(false, null, ['User not found']);
+      }
+        return bpmResponse;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
+    }
+  }
+
+  async generateRoomCode() {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    return code;
+  }
+
+  async isCodeExpired(date) {
+    const currentTimestamp = Date.now();
+    return currentTimestamp > date;
+  }
+
+  async verifyResetPasswordCode(verifyCodeDto: VerifyCodeDto) {
+    let bpmResponse;
+    try {
+      const user = await this.usersRepository.findOneOrFail({ where: { username: verifyCodeDto.email, active: true } });
+      if(user) {
+        if(user.resetPasswordCode == verifyCodeDto.code && !this.isCodeExpired(user.resetPasswordCodeSentDate)) {
+          bpmResponse = new BpmResponse(true, null);
+          user.resetPasswordCode = null;
+          user.resetPasswordCodeSentDate = null;
+          this.usersRepository.update({ id: user.id }, user);
+        } else {
+          bpmResponse = new BpmResponse(false, null, ['Code is Invalid']);
+        }
+      } else {
+        bpmResponse = new BpmResponse(false, null, ['User not found']);
+      }
+        return bpmResponse;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
+    }
+  }
+
 }

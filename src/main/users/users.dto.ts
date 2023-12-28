@@ -1,5 +1,5 @@
 
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsEmail, IsNotEmpty, IsUUID } from "class-validator";
 
 export class CreateUserDto {
 
@@ -37,4 +37,19 @@ export class UpdateUserDto {
 
   phoneNumber?: string;
 
+}
+
+export class SendCodeDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
+
+export class VerifyCodeDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNotEmpty()
+  code: string;
 }
