@@ -12,13 +12,16 @@ export class MerchantDto {
   email: string;
 
   @IsNotEmpty()
-  phoneNumbers: string[];
+  phoneNumber: string;
 
   @IsNotEmpty()
   companyName: string;
 
   @IsNotEmpty()
   password: string;
+
+  @IsNotEmpty()
+  responsiblePerson: string;
 
   registrationCertificateFilePath?: string;
   passportFilePath?: string;

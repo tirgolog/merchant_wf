@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { AuthGuard } from "src/shared/guards/auth/auth.guard";
 import { BpmResponse, ResponseStauses } from "..";
-import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto } from "./users.dto";
+import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto, VerifyPhoneDto } from "./users.dto";
 import { UsersService } from "./users.service";
 
 @Controller('api/v1/users')
@@ -69,6 +69,12 @@ export class UsersController {
     @UsePipes(ValidationPipe)
     async verifyCode(@Body() sendCodeDto: VerifyCodeDto) {
       return this.usersService.verifyResetPasswordCode(sendCodeDto);
+    }
+
+    @Post('phone-verify')
+    @UsePipes(ValidationPipe)
+    async phoneVerify(@Body() sendPhoneVerifyDto: VerifyPhoneDto) {
+      return this.usersService.phoneVerify(sendPhoneVerifyDto);
     }
 
     @Patch('password')

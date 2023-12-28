@@ -15,11 +15,14 @@ export class Merchant {
   @Column({ nullable: false })
   password: string;
 
-  @Column("text", { nullable: false, array: true, default: [] })
-  phoneNumbers: string[];
+  @Column({ nullable: true })
+  phoneNumber: string;
 
   @Column({ nullable: false })
   companyName: string;
+
+  @Column({ nullable: true })
+  responsiblePerson: string;
 
   @Column({ nullable: true })
   registrationCertificateFilePath?: string;

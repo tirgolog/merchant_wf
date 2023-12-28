@@ -6,7 +6,6 @@ import { Merchant } from './entities/merchant.entity';
 import { MerchantDto } from './merchant.dto';
 import { BpmResponse, User, Role, Cargo, Transaction } from '..';
 import { BankAccount } from './entities/bank-account.entity';
-import { CreateUserDto } from '../users/users.dto';
 
 @Injectable()
 export class MerchantService {
@@ -116,9 +115,10 @@ export class MerchantService {
 
       merchant.email = createMerchantDto.email;
       merchant.password = passwordHash;
-      merchant.phoneNumbers = createMerchantDto.phoneNumbers;
-      merchant.companyName = createMerchantDto.companyName
-      merchant.password = createMerchantDto.password
+      merchant.phoneNumber = createMerchantDto.phoneNumber;
+      merchant.companyName = createMerchantDto.companyName;
+      merchant.password = createMerchantDto.password;
+      merchant.responsiblePerson = createMerchantDto.responsiblePerson;
 
       if (createMerchantDto.registrationCertificateFilePath) {
         merchant.registrationCertificateFilePath = createMerchantDto.registrationCertificateFilePath;
@@ -183,9 +183,10 @@ export class MerchantService {
       const merchant: Merchant = await this.merchantsRepository.findOneBy({ id });
 
       merchant.email = updateMerchantDto.email;
-      merchant.phoneNumbers = updateMerchantDto.phoneNumbers;
-      merchant.companyName = updateMerchantDto.companyName
-      merchant.password = updateMerchantDto.password
+      merchant.phoneNumber = updateMerchantDto.phoneNumber;
+      merchant.companyName = updateMerchantDto.companyName;
+      merchant.password = updateMerchantDto.password;
+      merchant.responsiblePerson = updateMerchantDto.responsiblePerson;
 
       if (updateMerchantDto.password) {
         const saltOrRounds = 10;
@@ -265,6 +266,7 @@ export class MerchantService {
             fullName: merchant.supervisorFullName,
             password: passwordHash,
             username: merchant.email,
+            phoneNumber: merchant.phoneNumber,
             merchant: id,
             role: role
           }

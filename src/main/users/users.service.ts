@@ -2,16 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto } from './users.dto';
+import { CreateUserDto, SendCodeDto, UpdateUserDto, VerifyCodeDto, VerifyPhoneDto } from './users.dto';
 import * as bcrypt from 'bcrypt';
 import { BpmResponse, ResponseStauses } from '..';
 import { MailService } from 'src/shared/services/mail.service';
+import { SmsService } from 'src/shared/services/sms.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    private mailService: MailService
+    private mailService: MailService,
+    private smsService: SmsService
   ) { }
 
   async getUsers() {
@@ -170,6 +172,32 @@ export class UsersService {
         } else {
           bpmResponse = new BpmResponse(false, null, ['Code is Invalid']);
         }
+      } else {
+        bpmResponse = new BpmResponse(false, null, ['User not found']);
+      }
+        return bpmResponse;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
+    }
+  }
+
+  async phoneVerify(verifyPhoneDto: VerifyPhoneDto) {
+    let bpmResponse;
+    try {
+      const user = await this.usersRepository.findOneOrFail({ where: { phoneNumber: verifyPhoneDto.phone, active: true } });
+      if(user) {
+        const code = this.generateRoomCode()
+        const phone = verifyPhoneDto.phone;
+        const countryCode = verifyPhoneDto.countryCode;
+        if(phone.startsWith('+998') || phone.startsWith('998')) {
+          this.smsService.sendSmsLocal(phone, code)
+        } else if(phone.startsWith('+77') || phone.startsWith('77')) {
+          this.smsService.sendSmsRu(phone, code)
+        } else {
+          this.smsService.sendSmsGlobal(phone, code, countryCode)
+        }
+        bpmResponse = new BpmResponse(true, {code});
       } else {
         bpmResponse = new BpmResponse(false, null, ['User not found']);
       }
