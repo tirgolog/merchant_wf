@@ -120,9 +120,24 @@ export class UsersService {
       const saltOrRounds = 10;
       const passwordHash = await bcrypt.hash(newPassword, saltOrRounds);
       user.password = passwordHash;
-      await this.usersRepository.save(user);
+      await this.usersRepository.update({id: user.id}, user);
       return new BpmResponse(true, null, ['Updated'])
     }
+  }
+
+  async resetUserPassword(password: string, email: string) {
+    if (!password || !email) {
+      return new BpmResponse(false, null, ['All fields are required'])
+    }
+    const user: User = await this.usersRepository.findOne({ where: { active: true, username: email } });
+    if (!user) {
+      return new BpmResponse(false, null, ['User not found']);
+    }
+    const saltOrRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltOrRounds);
+    user.password = passwordHash;
+    await this.usersRepository.update({ id: user.id }, user);
+    return new BpmResponse(true, null, ['Updated'])
   }
 
   async sendMailToResetPassword(sendCodeDto: SendCodeDto) {
@@ -130,19 +145,19 @@ export class UsersService {
     let bpmResponse;
     try {
       const user = await this.usersRepository.findOneOrFail({ where: { username: sendCodeDto.email, active: true } });
-      if(user) {
+      if (user) {
         const info = await this.mailService.sendMail(sendCodeDto.email, 'Verification code', code)
-        const timestamp = Date.now(); // Capture the timestamp when the code is generated
+        const timestamp = new Date().getTime(); // Capture the timestamp when the code is generated
         const expirationTime = 3 * 60 * 1000; // 3 minutes in milliseconds
         console.log('Message sent: %s', info.messageId);
         user.resetPasswordCode = code;
-        user.resetPasswordCodeSentDate = timestamp + expirationTime;
+        user.resetPasswordCodeSentDate = (timestamp + expirationTime).toString();
         this.usersRepository.update({ id: user.id }, user);
         bpmResponse = new BpmResponse(true, null);
       } else {
         bpmResponse = new BpmResponse(false, null, ['User not found']);
       }
-        return bpmResponse;
+      return bpmResponse;
     } catch (error) {
       console.error('Error sending email:', error);
       return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
@@ -154,17 +169,17 @@ export class UsersService {
     return code;
   }
 
-  async isCodeExpired(date) {
+  async isCodeValid(date) {
     const currentTimestamp = Date.now();
-    return currentTimestamp > date;
+    return currentTimestamp <= date;
   }
 
   async verifyResetPasswordCode(verifyCodeDto: VerifyCodeDto) {
     let bpmResponse;
     try {
       const user = await this.usersRepository.findOneOrFail({ where: { username: verifyCodeDto.email, active: true } });
-      if(user) {
-        if(user.resetPasswordCode == verifyCodeDto.code && !this.isCodeExpired(user.resetPasswordCodeSentDate)) {
+      if (user) {
+        if (user.resetPasswordCode == verifyCodeDto.code && await this.isCodeValid(+user.resetPasswordCodeSentDate)) {
           bpmResponse = new BpmResponse(true, null);
           user.resetPasswordCode = null;
           user.resetPasswordCodeSentDate = null;
@@ -175,7 +190,7 @@ export class UsersService {
       } else {
         bpmResponse = new BpmResponse(false, null, ['User not found']);
       }
-        return bpmResponse;
+      return bpmResponse;
     } catch (error) {
       console.error('Error sending email:', error);
       return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);
@@ -186,22 +201,22 @@ export class UsersService {
     let bpmResponse;
     try {
       const user = await this.usersRepository.findOneOrFail({ where: { phoneNumber: verifyPhoneDto.phone, active: true } });
-      if(user) {
+      if (user) {
         const code = this.generateRoomCode()
         const phone = verifyPhoneDto.phone;
         const countryCode = verifyPhoneDto.countryCode;
-        if(phone.startsWith('+998') || phone.startsWith('998')) {
+        if (phone.startsWith('+998') || phone.startsWith('998')) {
           this.smsService.sendSmsLocal(phone, code)
-        } else if(phone.startsWith('+77') || phone.startsWith('77')) {
+        } else if (phone.startsWith('+77') || phone.startsWith('77')) {
           this.smsService.sendSmsRu(phone, code)
         } else {
           this.smsService.sendSmsGlobal(phone, code, countryCode)
         }
-        bpmResponse = new BpmResponse(true, {code});
+        bpmResponse = new BpmResponse(true, { code });
       } else {
         bpmResponse = new BpmResponse(false, null, ['User not found']);
       }
-        return bpmResponse;
+      return bpmResponse;
     } catch (error) {
       console.error('Error sending email:', error);
       return new BpmResponse(false, null, [ResponseStauses.CreateDataFailed]);

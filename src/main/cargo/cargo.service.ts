@@ -193,12 +193,12 @@ export class CargosService {
   async acceptCargo(createCargoDto: any, userId: string) {
     try {
       // Connect to RabbitMQ
-      this.connection = await amqp.connect('amqp://localhost');
-      this.channel = await this.connection.createChannel();
+      // this.connection = await amqp.connect('amqp://localhost');
+      // this.channel = await this.connection.createChannel();
 
       // Send message to RabbitMQ queue
-      await this.channel.assertQueue('acceptDriverOffer');
-      await this.channel.sendToQueue('acceptDriverOffer', Buffer.from(JSON.stringify(createCargoDto)));
+      // await this.channel.assertQueue('acceptDriverOffer');
+      // await this.channel.sendToQueue('acceptDriverOffer', Buffer.from(JSON.stringify(createCargoDto)));
 
       // Update cargo status in the database
       console.log(createCargoDto)
@@ -213,7 +213,7 @@ export class CargosService {
       console.log('Cargo status after update:', cargo.status);
 
       // Close RabbitMQ connection
-      await this.connection.close();
+      // await this.connection.close();
       this.eventsServcie.sendUpdateBalance('1')
       return new BpmResponse(true, null, null);
     } catch (error: any) {

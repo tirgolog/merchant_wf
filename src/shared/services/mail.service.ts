@@ -18,6 +18,7 @@ export class MailService {
   }
 
   async sendMail(to: string, subject: string, text: string) {
+    try {
     const mailOptions = {
       from: 'tirgolog@gmail.com',
       to,
@@ -25,7 +26,6 @@ export class MailService {
       text,
     };
 
-    try {
       const info = await this.transporter.sendMail(mailOptions);
       console.log('Message sent: %s', info.messageId);
       return info

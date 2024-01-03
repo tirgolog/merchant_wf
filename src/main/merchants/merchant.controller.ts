@@ -32,7 +32,7 @@ export class MerchantController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async create(@Body() createMerchantDto: any) {
+  async create(@Body() createMerchantDto: MerchantDto) {
     return this.merchantsService.createMerchant(createMerchantDto);
   }
 

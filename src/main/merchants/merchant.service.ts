@@ -112,12 +112,10 @@ export class MerchantService {
       const saltOrRounds = 10;
       const passwordHash = await bcrypt.hash(createMerchantDto.password, saltOrRounds);
       const merchant: Merchant = await this.merchantsRepository.create();
-
       merchant.email = createMerchantDto.email;
       merchant.password = passwordHash;
       merchant.phoneNumber = createMerchantDto.phoneNumber;
       merchant.companyName = createMerchantDto.companyName;
-      merchant.password = createMerchantDto.password;
       merchant.responsiblePerson = createMerchantDto.responsiblePerson;
 
       if (createMerchantDto.registrationCertificateFilePath) {
@@ -185,13 +183,14 @@ export class MerchantService {
       merchant.email = updateMerchantDto.email;
       merchant.phoneNumber = updateMerchantDto.phoneNumber;
       merchant.companyName = updateMerchantDto.companyName;
-      merchant.password = updateMerchantDto.password;
-      merchant.responsiblePerson = updateMerchantDto.responsiblePerson;
-
+      
       if (updateMerchantDto.password) {
         const saltOrRounds = 10;
         const passwordHash = await bcrypt.hash(updateMerchantDto.password, saltOrRounds);
         merchant.password = passwordHash;
+      }
+      if (updateMerchantDto.responsiblePerson) {
+        merchant.responsiblePerson = updateMerchantDto.responsiblePerson;
       }
       if (updateMerchantDto.registrationCertificateFilePath) {
         merchant.registrationCertificateFilePath = updateMerchantDto.registrationCertificateFilePath;
@@ -229,10 +228,10 @@ export class MerchantService {
       if (updateMerchantDto.bankName) {
         merchant.bankName = updateMerchantDto.bankName;
       }
-      const updatedMerchant = await this.merchantsRepository.save(merchant);
+      const updatedMerchant = await this.merchantsRepository.update({ id: merchant.id }, merchant);
       if (updateMerchantDto.bankAccounts) {
         await this.bankAccountRepository.delete({ merchantId: merchant.id });
-        updateMerchantDto.bankAccounts.forEach((el: any) => el.merchantId = updatedMerchant.id)
+        updateMerchantDto.bankAccounts.forEach((el: any) => el.merchantId = merchant.id)
         const accounts: any = updateMerchantDto.bankAccounts;
         this.bankAccountRepository
           .createQueryBuilder()
@@ -260,11 +259,11 @@ export class MerchantService {
         const verifed = await this.merchantsRepository.save(merchant);
         if (verifed) {
           const role = (await this.rolesRepository.findOne({ where: { name: 'Super admin' }}))?.id;
-          const saltOrRounds = 10;
-          const passwordHash = await bcrypt.hash(merchant.password, saltOrRounds);
+          // const saltOrRounds = 10;
+          // const passwordHash = await bcrypt.hash(merchant.password, saltOrRounds);
           const userObj: any = {
             fullName: merchant.supervisorFullName,
-            password: passwordHash,
+            password: merchant.password,
             username: merchant.email,
             phoneNumber: merchant.phoneNumber,
             merchant: id,

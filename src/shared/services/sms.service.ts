@@ -27,9 +27,9 @@ export class SmsService {
           Authorization: "Bearer " + token,
         },
       };
-      
+
       await rp(optionsRefresh);
-      
+
       const optionsUpdate = {
         method: "POST",
         body: {
@@ -41,7 +41,7 @@ export class SmsService {
       };
 
       const rp_res_update = await rp(optionsUpdate);
-      
+
       if (rp_res_update.data) {
         console.log("refreshTokenSmsEskiz", rp_res_update);
         config.smsToken = rp_res_update.data.token;
@@ -76,30 +76,31 @@ export class SmsService {
   async sendSmsLocal(phone, code) {
     console.log('local sms', phone);
     console.log('local sms', code);
-    let options = {
-      method: "POST",
-      uri: "http://91.204.239.44/broker-api/send",
-      json: true,
-      body: {
-        messages: [
-          {
-            recipient: "" + phone,
-            "message-id": "a" + new Date().getTime().toString(),
-            sms: {
-              originator: "3700",
-              content: {
-                text: "Confirmation code " + code,
+    try {
+
+      let options = {
+        method: "POST",
+        uri: "http://91.204.239.44/broker-api/send",
+        json: true,
+        body: {
+          messages: [
+            {
+              recipient: "" + phone,
+              "message-id": "a" + new Date().getTime().toString(),
+              sms: {
+                originator: "3700",
+                content: {
+                  text: "Confirmation code " + code,
+                },
               },
             },
-          },
-        ],
-      },
-      headers: {
-        Authorization:
-          "Basic " + Buffer.from("tirgo:C63Fs89yuN").toString("base64"),
-      },
-    };
-    try {
+          ],
+        },
+        headers: {
+          Authorization:
+            "Basic " + Buffer.from("tirgo:C63Fs89yuN").toString("base64"),
+        },
+      };
       let rp_res = await rp(options);
       if (rp_res === "Request is received") {
         return "waiting";
@@ -112,7 +113,7 @@ export class SmsService {
       console.log("finally");
     }
   }
-  
+
   async sendSmsRu(phone, code) {
     try {
       let options = {
@@ -130,7 +131,7 @@ export class SmsService {
       };
       await rp(options);
       return true;
-    } catch(err: any) {
+    } catch (err: any) {
       console.log(err);
       throw Error
     }
