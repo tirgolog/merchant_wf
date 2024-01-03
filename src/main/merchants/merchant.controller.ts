@@ -21,7 +21,7 @@ export class MerchantController {
   }
 
   @Get('email')
-  async getByEmail(@Query('emai') email: string) {
+  async getByEmail(@Query('email') email: string) {
     return this.merchantsService.getMerchantByEmail(email);
   }
 

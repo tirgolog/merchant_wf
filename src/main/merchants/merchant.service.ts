@@ -105,6 +105,9 @@ export class MerchantService {
 
   async getMerchantByEmail(email: string) {
     try {
+      if(!email) {
+        return new BpmResponse(false, null, ['Email is required']);  
+      }
       const data = await this.merchantsRepository.findOneOrFail({ where: { email, active: true } });
       if (data) {
         return new BpmResponse(true, data, null);
@@ -114,6 +117,7 @@ export class MerchantService {
     }
     catch (error: any) {
       console.log(error)
+      return new BpmResponse(false, null, ['Not found']);
     }
   }
 
