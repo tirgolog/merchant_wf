@@ -47,7 +47,7 @@ export class User {
   lastLogin?: Date;
 
   @Column({ nullable: true })
-  resetPasswordCodeSentDate?: number;
+  resetPasswordCodeSentDate?: string;
 
   @Column({ nullable: true })
   resetPasswordCode?: string;
