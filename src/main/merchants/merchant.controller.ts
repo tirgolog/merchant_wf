@@ -20,6 +20,11 @@ export class MerchantController {
     return this.merchantsService.getMerchants();
   }
 
+  @Get('email')
+  async getByEmail(@Query('emai') email: string) {
+    return this.merchantsService.getMerchantByEmail(email);
+  }
+
   @Get('verified')
   async getAllVerified() {
     return this.merchantsService.getVerifiedMerchants();
