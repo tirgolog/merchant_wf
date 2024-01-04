@@ -202,7 +202,7 @@ export class UsersService {
     try {
       const user = await this.usersRepository.findOneOrFail({ where: { phoneNumber: verifyPhoneDto.phone, active: true } });
       if (user) {
-        const code = this.generateRoomCode()
+        const code = await this.generateRoomCode()
         const phone = verifyPhoneDto.phone;
         const countryCode = verifyPhoneDto.countryCode;
         if (phone.startsWith('+998') || phone.startsWith('998')) {
