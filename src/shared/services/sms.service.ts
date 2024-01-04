@@ -1,7 +1,7 @@
 // mail.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import rp from 'request-promise';
+import * as rp from 'request-promise';
 import { Config } from '../entities/config.entity';
 import { Repository } from 'typeorm';
 
@@ -108,6 +108,7 @@ export class SmsService {
         return false;
       }
     } catch (err) {
+      console.log(err)
       throw Error
     } finally {
       console.log("finally");
