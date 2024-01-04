@@ -193,7 +193,7 @@ export class CargosService {
   async acceptCargo(createCargoDto: any, userId: string) {
     try {
       // Connect to RabbitMQ
-      this.connection = await amqp.connect('amqp://localhost');
+      this.connection = await amqp.connect("amqp://13.232.83.179:5672");
       this.channel = await this.connection.createChannel();
 
       // Send message to RabbitMQ queue
