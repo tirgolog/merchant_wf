@@ -46,7 +46,10 @@ export class Merchant {
   oked?: string;
 
   @Column({ nullable: true })
-  dunsNumber?: string;
+  dunsNumber?: number;
+
+  @Column({ nullable: true })
+  ibanNumber?: number;
 
   @Column({ nullable: true })
   supervisorFullName?: string;
@@ -83,6 +86,9 @@ export class Merchant {
 
   @Column({ default: new Date() })
   createdAt?: Date;
+
+  @Column({ default: false })
+  completed?: boolean;
 
   @Column({ default: true })
   active?: boolean;

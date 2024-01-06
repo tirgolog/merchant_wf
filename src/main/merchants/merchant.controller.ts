@@ -1,8 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Put, Query, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
-import { MerchantDto } from "./merchant.dto";
+import { CompleteMerchantDto, MerchantDto } from "./merchant.dto";
 import { MerchantService } from "./merchant.service";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { multerConfig } from "src/shared/multer.config";
 
 @Controller('api/v1/merchant')
 export class MerchantController {
@@ -20,11 +18,6 @@ export class MerchantController {
     return this.merchantsService.getMerchants();
   }
 
-  @Get('email')
-  async getByEmail(@Query('email') email: string) {
-    return this.merchantsService.getMerchantByEmail(email);
-  }
-
   @Get('verified')
   async getAllVerified() {
     return this.merchantsService.getVerifiedMerchants();
@@ -39,6 +32,12 @@ export class MerchantController {
   @UsePipes(ValidationPipe)
   async create(@Body() createMerchantDto: MerchantDto) {
     return this.merchantsService.createMerchant(createMerchantDto);
+  }
+
+  @Post('complete')
+  @UsePipes(ValidationPipe)
+  async complete(@Body() completeMerchantDto: CompleteMerchantDto) {
+    return this.merchantsService.completeMerchant(completeMerchantDto);
   }
 
   @Put()
