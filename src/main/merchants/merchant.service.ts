@@ -86,7 +86,7 @@ export class MerchantService {
 
   async findMerchantById(id: number) {
     try {
-      const data = await this.merchantsRepository.findOne({ where: { id, active: true, completed: true } });
+      const data = await this.merchantsRepository.findOne({ where: { id, active: true } });
       if (data) {
           const bankAccount: any = await this.bankAccountRepository.find({ where: { active: true, merchantId: data.id }, relations: ['currency'] })
           const accountData = bankAccount.map((el: any) => {
