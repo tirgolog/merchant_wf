@@ -4,8 +4,7 @@ import { PrimaryGeneratedColumn } from "typeorm";
 
 export class MerchantDto {
 
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id?: number;
 
   @IsEmail()
   @IsNotEmpty()
@@ -32,13 +31,71 @@ export class MerchantDto {
   mfo?: string;
   inn?: string;
   oked?: string;
-  dunsNumber?: string;
+  dunsNumber?: number;
   supervisorFullName?: string;
   legalAddress?: string;
   factAddress?: string;
   bankName?: string;
   bankAccounts?: iBankAccount[];
   verifiedBy?: string;
+}
+
+export class CompleteMerchantDto {
+
+  id?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  responsiblePerson: string;
+
+  @IsString()
+  @IsNotEmpty()
+  registrationCertificateFilePath?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  passportFilePath?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  logoFilePath?: string;
+
+
+  notes?: string;
+  dunsNumber?: number;
+  ibanNumber?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  mfo?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  inn?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  oked?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  supervisorFullName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  legalAddress?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  factAddress?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bankName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bankAccounts?: iBankAccount[];
 }
 
 export interface iBankAccount {
