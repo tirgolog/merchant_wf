@@ -200,8 +200,6 @@ export class UsersService {
   async phoneVerify(verifyPhoneDto: VerifyPhoneDto) {
     let bpmResponse;
     try {
-      const user = await this.usersRepository.findOneOrFail({ where: { phoneNumber: verifyPhoneDto.phone, active: true } });
-      if (user) {
         const code = await this.generateRoomCode()
         const phone = verifyPhoneDto.phone;
         const countryCode = verifyPhoneDto.countryCode;
@@ -213,9 +211,6 @@ export class UsersService {
           this.smsService.sendSmsGlobal(phone, code, countryCode)
         }
         bpmResponse = new BpmResponse(true, { code });
-      } else {
-        bpmResponse = new BpmResponse(false, null, ['User not found']);
-      }
       return bpmResponse;
     } catch (error) {
       console.error('Error sending email:', error);
