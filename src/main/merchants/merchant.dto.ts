@@ -93,8 +93,6 @@ export class CompleteMerchantDto {
   @IsNotEmpty()
   bankName?: string;
 
-  @IsString()
-  @IsNotEmpty()
   bankAccounts?: iBankAccount[];
 }
 
