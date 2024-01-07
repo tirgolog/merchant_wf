@@ -93,6 +93,7 @@ export class CompleteMerchantDto {
   @IsNotEmpty()
   bankName?: string;
 
+  bankAccounts?: iBankAccount[];
 }
 
 export interface iBankAccount {
