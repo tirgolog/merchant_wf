@@ -32,7 +32,8 @@ export class MerchantDto {
   inn?: string;
   oked?: string;
   dunsNumber?: number;
-  supervisorFullName?: string;
+  supervisorFirstName?: string;
+  supervisorLastName?: string;
   legalAddress?: string;
   factAddress?: string;
   bankName?: string;
@@ -81,7 +82,11 @@ export class CompleteMerchantDto {
 
   @IsString()
   @IsNotEmpty()
-  supervisorFullName?: string;
+  supervisorFirstName?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  supervisorLastName?: string;
 
   @IsString()
   @IsNotEmpty()

@@ -169,8 +169,11 @@ export class MerchantService {
       if (completeMerchantDto.dunsNumber) {
         merchant.dunsNumber = completeMerchantDto.dunsNumber;
       }
-      if (completeMerchantDto.supervisorFullName) {
-        merchant.supervisorFullName = completeMerchantDto.supervisorFullName;
+      if (completeMerchantDto.supervisorFirstName) {
+        merchant.supervisorFirstName = completeMerchantDto.supervisorFirstName;
+      }
+      if (completeMerchantDto.supervisorLastName) {
+        merchant.supervisorLastName = completeMerchantDto.supervisorLastName;
       }
       if (completeMerchantDto.legalAddress) {
         merchant.legalAddress = completeMerchantDto.legalAddress;
@@ -243,8 +246,11 @@ export class MerchantService {
       if (updateMerchantDto.dunsNumber) {
         merchant.dunsNumber = updateMerchantDto.dunsNumber;
       }
-      if (updateMerchantDto.supervisorFullName) {
-        merchant.supervisorFullName = updateMerchantDto.supervisorFullName;
+      if (updateMerchantDto.supervisorFirstName) {
+        merchant.supervisorFirstName = updateMerchantDto.supervisorFirstName;
+      }
+      if (updateMerchantDto.supervisorLastName) {
+        merchant.supervisorLastName = updateMerchantDto.supervisorLastName;
       }
       if (updateMerchantDto.legalAddress) {
         merchant.legalAddress = updateMerchantDto.legalAddress;
@@ -289,7 +295,7 @@ export class MerchantService {
           // const saltOrRounds = 10;
           // const passwordHash = await bcrypt.hash(merchant.password, saltOrRounds);
           const userObj: any = {
-            fullName: merchant.supervisorFullName,
+            fullName: merchant.supervisorFirstName + ' ' + merchant.supervisorLastName,
             password: merchant.password,
             username: merchant.email,
             phoneNumber: merchant.phoneNumber,
