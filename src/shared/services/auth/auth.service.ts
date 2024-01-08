@@ -32,7 +32,7 @@ export class AuthService {
       if (!(await bcrypt.compare(pass, merchant.password))) {
         throw new UnauthorizedException();
       }
-      const payload = { sub: merchant?.id, username: merchant.email };
+      const payload = { sub: merchant?.id, username: merchant.email, merchantId: merchant?.id };
       const access_token = await this.jwtService.signAsync(payload, { secret: 'jwt-merchant-secret-key' })
       return new BpmResponse(true, { access_token: access_token }, null)
     }
