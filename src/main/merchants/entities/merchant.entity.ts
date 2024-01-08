@@ -52,7 +52,10 @@ export class Merchant {
   ibanNumber?: number;
 
   @Column({ nullable: true })
-  supervisorFullName?: string;
+  supervisorFirstName?: string;
+
+  @Column({ nullable: true })
+  supervisorLastName?: string;
 
   @Column({ nullable: true })
   legalAddress?: string;
