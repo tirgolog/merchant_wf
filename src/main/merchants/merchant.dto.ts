@@ -42,6 +42,8 @@ export class MerchantDto {
 
 export class CompleteMerchantDto {
 
+  @IsString()
+  @IsNotEmpty()
   id?: number;
 
   @IsString()
