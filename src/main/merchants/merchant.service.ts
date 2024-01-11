@@ -145,8 +145,11 @@ export class MerchantService {
       if (completeMerchantDto.registrationCertificateFilePath) {
         merchant.registrationCertificateFilePath = completeMerchantDto.registrationCertificateFilePath;
       }
-      if (completeMerchantDto.responsiblePerson) {
-        merchant.responsiblePerson = completeMerchantDto.responsiblePerson;
+      if (completeMerchantDto.responsiblePersonLastName) {
+        merchant.responsiblePersonLastName = completeMerchantDto.responsiblePersonLastName;
+      }
+      if (completeMerchantDto.responsiblePersonFistName) {
+        merchant.responsiblePersonFistName = completeMerchantDto.responsiblePersonFistName;
       }
       if (completeMerchantDto.passportFilePath) {
         merchant.passportFilePath = completeMerchantDto.passportFilePath;
@@ -219,8 +222,11 @@ export class MerchantService {
         const passwordHash = await bcrypt.hash(updateMerchantDto.password, saltOrRounds);
         merchant.password = passwordHash;
       }
-      if (updateMerchantDto.responsiblePerson) {
-        merchant.responsiblePerson = updateMerchantDto.responsiblePerson;
+      if (updateMerchantDto.responsiblePersonLastName) {
+        merchant.responsiblePersonLastName = updateMerchantDto.responsiblePersonLastName;
+      }
+      if (updateMerchantDto.responsiblePersonFistName) {
+        merchant.responsiblePersonFistName = updateMerchantDto.responsiblePersonFistName;
       }
       if (updateMerchantDto.registrationCertificateFilePath) {
         merchant.registrationCertificateFilePath = updateMerchantDto.registrationCertificateFilePath;

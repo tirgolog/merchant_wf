@@ -22,7 +22,10 @@ export class Merchant {
   companyName: string;
 
   @Column({ nullable: true })
-  responsiblePerson: string;
+  responsiblePersonLastName: string;
+
+  @Column({ nullable: true })
+  responsiblePersonFistName: string;
 
   @Column({ nullable: true })
   registrationCertificateFilePath?: string;
