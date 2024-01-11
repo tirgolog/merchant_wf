@@ -22,7 +22,14 @@ export class MerchantDto {
   @IsNotEmpty()
   password: string;
 
-  responsiblePerson: string;
+  @IsString()
+  @IsNotEmpty()
+  responsiblePersonLastName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  responsiblePersonFistName: string;
+
 
   registrationCertificateFilePath?: string;
   passportFilePath?: string;
@@ -49,7 +56,11 @@ export class CompleteMerchantDto {
 
   @IsString()
   @IsNotEmpty()
-  responsiblePerson: string;
+  responsiblePersonLastName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  responsiblePersonFistName: string;
 
   @IsString()
   @IsNotEmpty()
