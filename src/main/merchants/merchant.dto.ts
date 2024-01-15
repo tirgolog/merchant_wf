@@ -22,12 +22,7 @@ export class MerchantDto {
   @IsNotEmpty()
   password: string;
 
-  @IsString()
-  @IsNotEmpty()
   responsiblePersonLastName: string;
-
-  @IsString()
-  @IsNotEmpty()
   responsiblePersonFistName: string;
 
 
