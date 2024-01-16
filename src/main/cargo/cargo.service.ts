@@ -50,7 +50,8 @@ export class CargosService {
       }
       const data: any = await this.cargoRepository.find({
         where: filter,
-        relations: ['createdBy', 'currency', 'cargoType', 'merchant']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant'],
+        order: { id: "DESC" }
       });
       for (let item of data) {
         const transportTypes = await this.transportTypesRepository.find({ where: { id: In(item.transportTypes) } })
@@ -152,7 +153,7 @@ export class CargosService {
         item.id = 'M' + item.id;
         item.isMerchant = true;
         item.acceptedOrders = data;
-        item.transportTypes = transportTypes.map((el: any) => +el.code);
+        item.transportTypes = transportTypes;
       };
       return new BpmResponse(true, data, null);
     }
