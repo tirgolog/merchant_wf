@@ -92,6 +92,21 @@ export class CargosService {
     }
   }
 
+  async cancelCargo(id: number) {
+    try {
+      // Perform cargo finishing logic
+      console.log('Cancel cargo: ', id)
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
+      cargo.status = 4; 
+      await this.cargoRepository.save(cargo);
+
+      return true;
+    } catch (error: any) {
+      console.error(error);
+      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getToken() {
     await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
     const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
