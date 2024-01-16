@@ -34,10 +34,12 @@ export class AuthGuard implements CanActivate {
           secret: 'jwt-merchant-secret-key'
         }
       );
-      const user = await this.usersService.findUserByIot(payload.sub);
+      if(isNaN(payload.sub)) {
+        const user = await this.usersService.findUserByIot(payload.sub);
+        request['user'] = user;
+      } 
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = user;
     } catch (err: any) {
       console.log(err)
       throw new UnauthorizedException();
