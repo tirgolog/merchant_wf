@@ -8,6 +8,7 @@ import { UsersModule } from "../users/users.module";
 import { RolesModule } from "../roles/role.module";
 import { CargosModule } from "../cargo/cargo.module";
 import { TransactionsModule } from "../transaction/transaction.module";
+import { SharedModule } from "src/shared/modules/shared.module";
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { TransactionsModule } from "../transaction/transaction.module";
         UsersModule,
         RolesModule,
         CargosModule,
-        TransactionsModule
+        TransactionsModule,
+        SharedModule
     ],
     controllers: [
         MerchantController
