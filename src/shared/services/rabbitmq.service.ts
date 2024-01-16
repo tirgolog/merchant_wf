@@ -88,6 +88,7 @@ export class RabbitMQService implements OnModuleInit {
   private async handleAdminCancelOrder(msg: amqp.ConsumeMessage | null) {
     if (msg) {
       const messageContent = msg.content.toString();
+      console.log(messageContent)
       try {
         const data = JSON.parse(messageContent);;
         console.log(`Received message acceptAdminCancelOrder: ${JSON.stringify(data)}`);
