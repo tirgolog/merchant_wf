@@ -12,7 +12,6 @@ export class CargoDto {
 
   cargoDeliveryLocation?: string;
 
-  @IsUUID()
   @IsNotEmpty()
   transportTypeIds: string[];
  
