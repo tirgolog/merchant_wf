@@ -26,12 +26,12 @@ export class CargosService {
         where: { active: true },
         relations: ['createdBy', 'currency', 'cargoType', 'merchant']
       });
-      data.forEach(async (el: any) => {
-        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(el.transportTypes) } })
-        el.id = 'M' + el.id;
-        el.isMerchant = true;
-        el.transportTypes = transportTypes;
-      });
+      for (let item of data) {
+        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(item.transportTypes) } })
+        item.id = 'M' + item.id;
+        item.isMerchant = true;
+        item.transportTypes = transportTypes.map((el: any) => +el.code);
+      }
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -50,14 +50,16 @@ export class CargosService {
       }
       const data: any = await this.cargoRepository.find({
         where: filter,
-        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportTypes']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant']
       });
-      data.forEach((el: any) => {
-        el.id = 'M' + el.id;
-        el.isMerchant = true;
-        el.driverId = 0;
-        el.acceptedOrders = [];
-      });
+      for (let item of data) {
+        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(item.transportTypes) } })
+        item.id = 'M' + item.id;
+        item.isMerchant = true;
+        item.driverId = 0;
+        item.acceptedOrders = [];
+        item.transportTypes = transportTypes.map((el: any) => +el.code);
+      }
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -140,15 +142,18 @@ export class CargosService {
       const acceptedOrders = testData.data.data[0]
       let data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
+        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant'],
+        order: { id: "DESC" }
       });
       data = data?.filter((el: any) => el.merchant.id == id);
-      data.forEach((el: any) => {
-        const data = acceptedOrders?.filter((order: any) => order.orderid == el.id);
-        el.id = 'M' + el.id;
-        el.isMerchant = true;
-        el.acceptedOrders = data;
-      });
+      for (let item of data) {
+        const data = acceptedOrders?.filter((order: any) => order.orderid == item.id);
+        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(item.transportTypes) } })
+        item.id = 'M' + item.id;
+        item.isMerchant = true;
+        item.acceptedOrders = data;
+        item.transportTypes = transportTypes.map((el: any) => +el.code);
+      };
       return new BpmResponse(true, data, null);
     }
     catch (error: any) {
@@ -162,8 +167,10 @@ export class CargosService {
         where: { id, active: true },
         relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
       });
+      const transportTypes = await this.transportTypesRepository.find({ where: { id: In(data.transportTypes) } })
       data.id = 'M' + data.id;
       data.isMerchant = true;
+      data.transportTypes = transportTypes.map((el: any) => el.code)
       return new BpmResponse(true, data, null);
     } catch (error: any) {
       console.log(error)
