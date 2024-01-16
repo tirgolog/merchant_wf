@@ -14,7 +14,7 @@ export class CargoDto {
 
   @IsUUID()
   @IsNotEmpty()
-  transportTypeId: string;
+  transportTypeIds: string[];
  
   @IsUUID()
   @IsNotEmpty()

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { BpmResponse } from '..';
+import { In, Repository } from 'typeorm';
+import { BpmResponse, TransportType } from '..';
 import { Cargo } from './cargo.entity';
 import { CargoDto } from './cargo.dto';
 import axios from 'axios';
@@ -12,6 +12,7 @@ import { SseGateway } from 'src/shared/gateway/sse.gateway';
 export class CargosService {
   constructor(
     @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
+    @InjectRepository(TransportType) private readonly transportTypesRepository: Repository<TransportType>,
     private eventsServcie: SseGateway
     // private readonly rabbitMQService: RabbitMQService
   ) { }
@@ -23,7 +24,7 @@ export class CargosService {
     try {
       const data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportType']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportTypes']
       });
       data.forEach((el: any) => {
         el.id = 'M'+el.id;
@@ -47,14 +48,14 @@ export class CargosService {
       }
       const data: any = await this.cargoRepository.find({
         where: filter,
-        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportType']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportTypes']
       });
       data.forEach((el: any) => {
         el.id = 'M'+el.id;
         el.isMerchant = true;
         el.driverId = 0;
         el.acceptedOrders = [];
-        el.transportTypes = [el.transportType?.code];
+        el.transportTypes = el.transportTypes.map((el: any) => el.code);
       });
       return new BpmResponse(true, data, null);
     }
@@ -138,7 +139,7 @@ export class CargosService {
       const acceptedOrders = testData.data.data[0]
       let data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
+        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
       });
       data = data?.filter((el: any) => el.merchant.id == id);
       data.forEach((el: any) => {
@@ -158,7 +159,7 @@ export class CargosService {
     try {
       const data: any = await this.cargoRepository.findOneOrFail({
          where: { id, active: true },
-         relations: ['createdBy', 'currency', 'cargoType', 'transportType', 'merchant']
+         relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
         });
         data.id = 'M'+data.id;
         data.isMerchant = true;
@@ -170,10 +171,12 @@ export class CargosService {
 
   async createCargo(createCargoDto: CargoDto, userId: string) {
     try {
+      const transportTypes = await this.transportTypesRepository.find({ where: { id: In(createCargoDto.transportTypeIds) } });
+
       const cargo: Cargo = new Cargo();
       cargo.sendLocation = createCargoDto.sendLocation;
       cargo.cargoDeliveryLocation = createCargoDto.cargoDeliveryLocation || null;
-      cargo.transportType = createCargoDto.transportTypeId;
+      cargo.transportTypes = transportTypes;
       cargo.cargoType = createCargoDto.cargoTypeId;
       cargo.sendCargoDate = createCargoDto.sendCargoDate;
       cargo.sendCargoTime = createCargoDto.sendCargoTime;
@@ -287,9 +290,10 @@ export class CargosService {
       if(!cargo) {
         return new BpmResponse(false, null, ['Cargo not found']);
       }
+      const transportTypes = await this.transportTypesRepository.find({ where: { id: In(updateCargoDto.transportTypeIds) } });
       cargo.sendLocation = updateCargoDto.sendLocation;
       cargo.cargoDeliveryLocation = updateCargoDto.cargoDeliveryLocation || null;
-      cargo.transportType = updateCargoDto.transportTypeId;
+      cargo.transportTypes = transportTypes;
       cargo.cargoType = updateCargoDto.cargoTypeId;
       cargo.sendCargoDate = updateCargoDto.sendCargoDate;
       cargo.sendCargoTime = updateCargoDto.sendCargoTime;
