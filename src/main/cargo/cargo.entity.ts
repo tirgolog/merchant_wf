@@ -16,9 +16,8 @@ export class Cargo {
   @Column({ nullable: true })
   cargoDeliveryLocation?: string;
 
-  @ManyToMany(() => TransportType, transportType => transportType.cargos)
-  @JoinTable()
-  transportTypes: TransportType[];
+  @Column({ type: 'text', array: true, default: '{}' })
+  transportTypes: string[]; //
 
   @ManyToOne(() => CargoType, (cargoType) => cargoType.cargo, { nullable: false })
   cargoType: string;
