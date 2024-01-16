@@ -59,6 +59,12 @@ export class SseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.subscribers.forEach(subscriber => subscriber.next(eventData));
   }
 
+  sendCancelOrder(dynamicData: string): void {
+    // Send dynamic data to all connected clients
+    const eventData: SseEvent = { data: dynamicData, type: 'admin-cancel-order' };
+    this.subscribers.forEach(subscriber => subscriber.next(eventData));
+  }
+
   sendVerifiedTransction(dynamicData: string): void {
     // Send dynamic data to all connected clients
     const eventData: SseEvent = { data: dynamicData, type: 'transaction-verified' };

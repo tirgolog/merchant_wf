@@ -27,6 +27,7 @@ export class RabbitMQService implements OnModuleInit {
     await this.channel.assertQueue('finishOrderDriver');
     await this.channel.assertQueue('acceptOrderDriver');
     await this.channel.assertQueue('acceptAdminAppendOrder');
+    await this.channel.assertQueue('cancelOrder');
   }
 
   private async setupQueueConsumers() {
@@ -34,6 +35,7 @@ export class RabbitMQService implements OnModuleInit {
     this.channel.consume('finishOrderDriver', this.handleFinishOrderMessage.bind(this), { noAck: true });
     this.channel.consume('acceptOrderDriver', this.handleAcceptOrderDriverMessage.bind(this), { noAck: true });
     this.channel.consume('acceptAdminAppendOrder', this.handleAdminAppendOrder.bind(this), { noAck: true });
+    this.channel.consume('cancelOrder', this.handleAdminCancelOrder.bind(this), { noAck: true });
   }
 
   private async handleFinishOrderMessage(msg: amqp.ConsumeMessage | null) {
@@ -79,6 +81,24 @@ export class RabbitMQService implements OnModuleInit {
         
       } catch (error) {
         console.error('Error parsing message acceptAdminAppendOrder:', error);
+      }
+    }
+  }
+
+  private async handleAdminCancelOrder(msg: amqp.ConsumeMessage | null) {
+    if (msg) {
+      const messageContent = msg.content.toString();
+      console.log(messageContent)
+      try {
+        const data = JSON.parse(messageContent);;
+        console.log(`Received message acceptAdminCancelOrder: ${JSON.stringify(data)}`);
+        
+        // Process the message using CargosService
+        await this.cargosService.appendCargo(data);
+        this.eventService.sendCancelOrder('1')
+        
+      } catch (error) {
+        console.error('Error parsing message acceptAdminCancelOrder:', error);
       }
     }
   }
