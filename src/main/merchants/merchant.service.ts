@@ -6,6 +6,7 @@ import { Merchant } from './entities/merchant.entity';
 import { CompleteMerchantDto, MerchantDto } from './merchant.dto';
 import { BpmResponse, User, Role, Cargo, Transaction } from '..';
 import { BankAccount } from './entities/bank-account.entity';
+import { SseGateway } from 'src/shared/gateway/sse.gateway';
 
 @Injectable()
 export class MerchantService {
@@ -15,7 +16,8 @@ export class MerchantService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Role) private readonly rolesRepository: Repository<Role>,
     @InjectRepository(Cargo) private readonly cargosRepository: Repository<Cargo>,
-    @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>
+    @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>,
+    private eventsService: SseGateway
   ) { }
 
   async getMerchants() {
@@ -309,6 +311,7 @@ export class MerchantService {
             role: role
           }
           this.usersRepository.save(userObj);
+          this.eventsService.sendVerifiedTransction('1')
           return new BpmResponse(true, null, ['Merchant verified']);
         }
       } else {

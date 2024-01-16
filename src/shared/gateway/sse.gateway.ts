@@ -65,6 +65,12 @@ export class SseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.subscribers.forEach(subscriber => subscriber.next(eventData));
   }
 
+  sendVerifiedMerchant(dynamicData: string): void {
+    // Send dynamic data to all connected clients
+    const eventData: SseEvent = { data: dynamicData, type: 'merchant-verified' };
+    this.subscribers.forEach(subscriber => subscriber.next(eventData));
+  }
+
   handleConnection(client: any, ...args: any[]): any {
     // Handle new SSE connection
   }
