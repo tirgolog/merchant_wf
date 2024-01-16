@@ -19,9 +19,6 @@ export class TransportType {
   @Column({ nullable: true })
   description?: string;
 
-  @ManyToMany(() => Cargo, cargo => cargo.transportTypes)
-  cargos: Cargo[];
-
   @Column({ default: new Date() })
   createdAt?: Date;
 

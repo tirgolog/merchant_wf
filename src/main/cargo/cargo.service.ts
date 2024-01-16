@@ -171,12 +171,12 @@ export class CargosService {
 
   async createCargo(createCargoDto: CargoDto, userId: string) {
     try {
-      const transportTypes = await this.transportTypesRepository.find({ where: { id: In(createCargoDto.transportTypeIds) } });
+      // const transportTypes = await this.transportTypesRepository.find({ where: { id: In(createCargoDto.transportTypeIds) } });
 
       const cargo: Cargo = new Cargo();
       cargo.sendLocation = createCargoDto.sendLocation;
       cargo.cargoDeliveryLocation = createCargoDto.cargoDeliveryLocation || null;
-      cargo.transportTypes = transportTypes;
+      cargo.transportTypes = createCargoDto.transportTypeIds;
       cargo.cargoType = createCargoDto.cargoTypeId;
       cargo.sendCargoDate = createCargoDto.sendCargoDate;
       cargo.sendCargoTime = createCargoDto.sendCargoTime;
@@ -290,10 +290,10 @@ export class CargosService {
       if(!cargo) {
         return new BpmResponse(false, null, ['Cargo not found']);
       }
-      const transportTypes = await this.transportTypesRepository.find({ where: { id: In(updateCargoDto.transportTypeIds) } });
+      // const transportTypes = await this.transportTypesRepository.find({ where: { id: In(updateCargoDto.transportTypeIds) } });
       cargo.sendLocation = updateCargoDto.sendLocation;
       cargo.cargoDeliveryLocation = updateCargoDto.cargoDeliveryLocation || null;
-      cargo.transportTypes = transportTypes;
+      cargo.transportTypes = updateCargoDto.transportTypeIds;
       cargo.cargoType = updateCargoDto.cargoTypeId;
       cargo.sendCargoDate = updateCargoDto.sendCargoDate;
       cargo.sendCargoTime = updateCargoDto.sendCargoTime;
