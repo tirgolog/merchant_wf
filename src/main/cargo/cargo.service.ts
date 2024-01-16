@@ -55,7 +55,6 @@ export class CargosService {
         el.isMerchant = true;
         el.driverId = 0;
         el.acceptedOrders = [];
-        el.transportTypes = el.transportTypes.map((el: any) => el.code);
       });
       return new BpmResponse(true, data, null);
     }
