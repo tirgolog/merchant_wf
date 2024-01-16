@@ -142,7 +142,7 @@ export class CargosService {
       const acceptedOrders = testData.data.data[0]
       let data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant'],
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant'],
         order: { id: "DESC" }
       });
       data = data?.filter((el: any) => el.merchant.id == id);
@@ -165,7 +165,7 @@ export class CargosService {
     try {
       const data: any = await this.cargoRepository.findOneOrFail({
         where: { id, active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant']
       });
       const transportTypes = await this.transportTypesRepository.find({ where: { id: In(data.transportTypes) } })
       data.id = 'M' + data.id;
