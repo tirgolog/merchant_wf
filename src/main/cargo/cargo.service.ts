@@ -24,11 +24,13 @@ export class CargosService {
     try {
       const data: any = await this.cargoRepository.find({
         where: { active: true },
-        relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportTypes']
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant']
       });
-      data.forEach((el: any) => {
-        el.id = 'M'+el.id;
+      data.forEach(async (el: any) => {
+        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(el.transportTypes) } })
+        el.id = 'M' + el.id;
         el.isMerchant = true;
+        el.transportTypes = transportTypes;
       });
       return new BpmResponse(true, data, null);
     }
@@ -41,7 +43,7 @@ export class CargosService {
     try {
       const isSafe = secure == true ? !!secure : false;
       let filter: any = {};
-      if(isSafe) {
+      if (isSafe) {
         filter = { active: true, isSafe }
       } else {
         filter = { active: true }
@@ -51,7 +53,7 @@ export class CargosService {
         relations: ['createdBy', 'currency', 'cargoType', 'merchant', 'transportTypes']
       });
       data.forEach((el: any) => {
-        el.id = 'M'+el.id;
+        el.id = 'M' + el.id;
         el.isMerchant = true;
         el.driverId = 0;
         el.acceptedOrders = [];
@@ -82,7 +84,7 @@ export class CargosService {
       // Perform cargo finishing logic
       console.log('Append cargo: ', id)
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
-      cargo.status = 1; 
+      cargo.status = 1;
       await this.cargoRepository.save(cargo);
 
       return new BpmResponse(true, null, null);
@@ -97,7 +99,7 @@ export class CargosService {
       // Perform cargo finishing logic
       console.log('Cancel cargo: ', id)
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
-      cargo.status = 4; 
+      cargo.status = 4;
       await this.cargoRepository.save(cargo);
 
       return true;
@@ -108,26 +110,26 @@ export class CargosService {
   }
 
   async getToken() {
-    await axios.post('https://admin.tirgo.io/api/users/login', {phone: '998935421324'})
-    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', {phone: '998935421324', code: '00000'})
+    await axios.post('https://admin.tirgo.io/api/users/login', { phone: '998935421324' })
+    const testData = await axios.post('https://admin.tirgo.io/api/users/codeverify', { phone: '998935421324', code: '00000' })
     return testData.data?.token
   }
 
   async findCity(body: any) {
     const token = await this.getToken();
-    const testData = await axios.post('https://admin.tirgo.io/api/users/findCity', {query: body.query},{
+    const testData = await axios.post('https://admin.tirgo.io/api/users/findCity', { query: body.query }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
     return new BpmResponse(true, testData.data.data, null);
   }
-  
+
 
   async getMerchantCargos(id: number) {
     try {
-      if(!id) {
-        return new BpmResponse(false, null, ['Merchant id is required !']);   
+      if (!id) {
+        return new BpmResponse(false, null, ['Merchant id is required !']);
       }
       const token = await this.getToken();
       const testData = await axios.get('https://admin.tirgo.io/api/users/getAcceptedOrdersDriver', {
@@ -143,7 +145,7 @@ export class CargosService {
       data = data?.filter((el: any) => el.merchant.id == id);
       data.forEach((el: any) => {
         const data = acceptedOrders?.filter((order: any) => order.orderid == el.id);
-        el.id = 'M'+el.id;
+        el.id = 'M' + el.id;
         el.isMerchant = true;
         el.acceptedOrders = data;
       });
@@ -157,11 +159,11 @@ export class CargosService {
   async findCargoById(id: number) {
     try {
       const data: any = await this.cargoRepository.findOneOrFail({
-         where: { id, active: true },
-         relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
-        });
-        data.id = 'M'+data.id;
-        data.isMerchant = true;
+        where: { id, active: true },
+        relations: ['createdBy', 'currency', 'cargoType', 'transportTypes', 'merchant']
+      });
+      data.id = 'M' + data.id;
+      data.isMerchant = true;
       return new BpmResponse(true, data, null);
     } catch (error: any) {
       console.log(error)
@@ -192,9 +194,9 @@ export class CargosService {
       cargo.isSafe = createCargoDto.isSafe || false;
       cargo.createdBy = userId;
       cargo.start_lat = createCargoDto.start_lat;
-      cargo.start_lng =  createCargoDto.start_lng;
-      cargo.finish_lat =  createCargoDto.finish_lat;
-      cargo.finish_lng =  createCargoDto.finish_lng;
+      cargo.start_lng = createCargoDto.start_lng;
+      cargo.finish_lat = createCargoDto.finish_lat;
+      cargo.finish_lng = createCargoDto.finish_lng;
 
 
       const newCargo = await this.cargoRepository.save(cargo);
@@ -245,7 +247,7 @@ export class CargosService {
     }
   }
 
-  
+
   async finishMerchantCargo(finishCargoDto: any, userId: string) {
     try {
       // Update cargo status in the database
@@ -253,7 +255,7 @@ export class CargosService {
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id: orderId } });
       console.log('Cargo status before update:', cargo.status);
 
-      
+
       // Log updated cargo status
       console.log('Cargo status after update:', cargo.status);
       const token = await this.getToken();
@@ -263,7 +265,7 @@ export class CargosService {
         },
       })
 
-      if(testData.data?.status) {
+      if (testData.data?.status) {
         // Update cargo status
         cargo.status = 3;
         await this.cargoRepository.update({ id: cargo.id }, cargo);
@@ -286,7 +288,7 @@ export class CargosService {
     try {
 
       const cargo: Cargo = await this.cargoRepository.findOneBy({ id, active: true });
-      if(!cargo) {
+      if (!cargo) {
         return new BpmResponse(false, null, ['Cargo not found']);
       }
       // const transportTypes = await this.transportTypesRepository.find({ where: { id: In(updateCargoDto.transportTypeIds) } });
@@ -319,8 +321,8 @@ export class CargosService {
   }
 
   async deleteCargo(id: number): Promise<BpmResponse> {
-    if(!id) {
-      return new BpmResponse(false, null, ['Id is required !']);   
+    if (!id) {
+      return new BpmResponse(false, null, ['Id is required !']);
     }
     const isDeleted = await this.cargoRepository.createQueryBuilder()
       .update(Cargo)
