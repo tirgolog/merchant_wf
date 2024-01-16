@@ -94,7 +94,7 @@ export class RabbitMQService implements OnModuleInit {
         console.log(`Received message acceptAdminCancelOrder: ${JSON.stringify(data)}`);
         
         // Process the message using CargosService
-        await this.cargosService.appendCargo(data);
+        await this.cargosService.cancelCargo(data);
         this.eventService.sendCancelOrder('1')
         
       } catch (error) {
