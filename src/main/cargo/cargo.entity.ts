@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Currency } from '../currencies/currency.entity';
 import { CargoType } from '../cargo-type/cargo-type.entity';
@@ -16,8 +16,8 @@ export class Cargo {
   @Column({ nullable: true })
   cargoDeliveryLocation?: string;
 
-  @ManyToOne(() => TransportType, (transportType) => transportType.cargo, { nullable: false })
-  transportType: string;
+  @ManyToMany(() => TransportType, transportType => transportType.cargos)
+  transportTypes: TransportType[];
 
   @ManyToOne(() => CargoType, (cargoType) => cargoType.cargo, { nullable: false })
   cargoType: string;

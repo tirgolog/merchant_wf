@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Cargo } from '../cargo/cargo.entity';
 
@@ -19,8 +19,8 @@ export class TransportType {
   @Column({ nullable: true })
   description?: string;
 
-  @OneToMany(() => Cargo, (cargo) => cargo.transportType)
-  cargo: string;
+  @ManyToMany(() => Cargo, cargo => cargo.transportTypes)
+  cargos: Cargo[];
 
   @Column({ default: new Date() })
   createdAt?: Date;

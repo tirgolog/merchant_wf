@@ -5,11 +5,13 @@ import { CargoController } from "./cargo.controller";
 import { CargosService } from "./cargo.service";
 import { SharedModule } from "src/shared/modules/shared.module";
 import { RabbitMQService } from "src/shared/services/rabbitmq.service";
+import { TransportTypesModule } from "../transport-type/transport-type.module";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Cargo]),
-        forwardRef(() => SharedModule)
+        forwardRef(() => SharedModule),
+        TransportTypesModule
     ],
     controllers: [
         CargoController
