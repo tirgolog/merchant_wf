@@ -24,7 +24,7 @@ import { SocketGateway } from './shared/gateway/socket.gateway';
         host: 'localhost',
         port: 5432,
         username: 'postgres',
-        password: 'postgres',
+        password: '2000',
         database: 'merchant',
         entities: entities,
         synchronize: true,
