@@ -24,6 +24,11 @@ export class CargoController {
     return this.cargosService.getDriverCargos(secure);
   }
 
+  @Get('all-admin')
+  async getAllAdminCargos(@Query('secure') secure: boolean) {
+    return this.cargosService.getAdminCargos(secure);
+  }
+
   @Get('merchant')
   async getAllMerchant(@Query('id') id: number) {
     return this.cargosService.getMerchantCargos(id);
