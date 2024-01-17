@@ -68,6 +68,35 @@ export class CargosService {
     }
   }
 
+  async getAdminCargos(secure: boolean) {
+    try {
+      const isSafe = secure == true ? !!secure : false;
+      let filter: any = {};
+      if (isSafe) {
+        filter = { active: true, isSafe }
+      } else {
+        filter = { active: true }
+      }
+      const data: any = await this.cargoRepository.find({
+        where: filter,
+        relations: ['createdBy', 'currency', 'cargoType', 'merchant'],
+        order: { id: "DESC" }
+      });
+      for (let item of data) {
+        const transportTypes = await this.transportTypesRepository.find({ where: { id: In(item.transportTypes) } })
+        item.id = 'M' + item.id;
+        item.isMerchant = true;
+        item.driverId = 0;
+        item.acceptedOrders = [];
+        item.transportTypes = transportTypes.map((el: any) => +el.code);
+      }
+      return new BpmResponse(true, data, null);
+    }
+    catch (error: any) {
+      console.log(error)
+    }
+  }
+
   async finishCargo(id: number): Promise<BpmResponse> {
     try {
       // Perform cargo finishing logic
