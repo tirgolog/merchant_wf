@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { BpmResponse, TransportType } from '..';
 import { Cargo } from './cargo.entity';
 import { CargoDto } from './cargo.dto';
@@ -23,7 +23,7 @@ export class CargosService {
   async getCargos() {
     try {
       const data: any = await this.cargoRepository.find({
-        where: { active: true },
+        where: { active: true, status: Not(4) },
         relations: ['createdBy', 'currency', 'cargoType', 'merchant']
       });
       for (let item of data) {
@@ -44,9 +44,9 @@ export class CargosService {
       const isSafe = secure == true ? !!secure : false;
       let filter: any = {};
       if (isSafe) {
-        filter = { active: true, isSafe }
+        filter = { active: true, isSafe, status: Not(4) }
       } else {
-        filter = { active: true }
+        filter = { active: true, status: Not(4) }
       }
       const data: any = await this.cargoRepository.find({
         where: filter,
@@ -142,7 +142,7 @@ export class CargosService {
       })
       const acceptedOrders = testData.data.data[0]
       let data: any = await this.cargoRepository.find({
-        where: { active: true },
+        where: { active: true, status: Not(4) },
         relations: ['createdBy', 'currency', 'cargoType', 'merchant'],
         order: { id: "DESC" }
       });
