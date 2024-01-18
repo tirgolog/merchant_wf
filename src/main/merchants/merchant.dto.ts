@@ -69,6 +69,14 @@ export class CompleteMerchantDto {
   @IsNotEmpty()
   logoFilePath?: string;
 
+  @IsString()
+  @IsNotEmpty()
+  taxPayerCode?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  responsbilePersonPhoneNumber?: string;
+
 
   notes?: string;
   dunsNumber?: number;

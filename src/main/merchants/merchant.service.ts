@@ -144,6 +144,12 @@ export class MerchantService {
     try {
       const merchant: Merchant = await this.merchantsRepository.findOneOrFail({  where: { id: completeMerchantDto.id }});
 
+      if (completeMerchantDto.taxPayerCode) {
+        merchant.taxPayerCode = completeMerchantDto.taxPayerCode;
+      }
+      if (completeMerchantDto.responsbilePersonPhoneNumber) {
+        merchant.responsbilePersonPhoneNumber = completeMerchantDto.responsbilePersonPhoneNumber;
+      }
       if (completeMerchantDto.registrationCertificateFilePath) {
         merchant.registrationCertificateFilePath = completeMerchantDto.registrationCertificateFilePath;
       }
