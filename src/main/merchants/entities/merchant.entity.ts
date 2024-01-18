@@ -69,6 +69,12 @@ export class Merchant {
   @Column({ nullable: true })
   bankName?: string;
 
+  @Column({ nullable: true, name: 'tax_payer_code' })
+  taxPayerCode?: string;
+
+  @Column({ nullable: true, name: 'responsible_person_phone_number' })
+  responsbilePersonPhoneNumber?: string;
+
   @OneToMany(() => BankAccount, (bankAccount) => bankAccount.merchant)
   bankAccounts?: number;
   
