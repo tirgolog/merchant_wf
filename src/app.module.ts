@@ -29,7 +29,6 @@ import { SocketGateway } from './shared/gateway/socket.gateway';
         entities: entities,
         synchronize: true,
         autoLoadEntities: true,
-
       }),
       inject: [ConfigService],
     }),
