@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Currency } from '../currencies/currency.entity';
 import { Merchant } from '../merchants/entities/merchant.entity';
 import { Role } from '../roles/role.entity';
@@ -40,7 +40,7 @@ export class User {
   @OneToMany(() => Transaction, (finance) => finance.createdBy)
   transactions?: string;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @Column({ default: new Date() })

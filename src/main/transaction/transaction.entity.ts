@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Merchant } from '../merchants/entities/merchant.entity';
 
@@ -22,7 +22,7 @@ export class Transaction {
   @Column({ default: false })
   rejected?: boolean;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @ManyToOne(() => User, (user) => user.transactions)

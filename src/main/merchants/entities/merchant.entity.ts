@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BankAccount } from './bank-account.entity';
 import { User } from 'src/main/users/user.entity';
 import { Cargo } from 'src/main/cargo/cargo.entity';
@@ -96,7 +96,7 @@ export class Merchant {
   @Column({ nullable: true })
   verifiedBy?: string;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @Column({ default: false })

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Cargo } from '../cargo/cargo.entity';
 
@@ -22,7 +22,7 @@ export class CargoType {
   @OneToMany(() => Cargo, (cargo) => cargo.cargoType)
   cargo: string;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @Column({ nullable: true })

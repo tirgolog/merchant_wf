@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BankAccount } from '../merchants/entities/bank-account.entity';
 import { User } from '../users/user.entity';
 
@@ -16,7 +16,7 @@ export class Role {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @Column({ nullable: true })

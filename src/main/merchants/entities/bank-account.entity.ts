@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Merchant, Currency } from '../..';
 
 @Entity()
@@ -18,7 +18,7 @@ export class BankAccount {
   @ManyToOne(() => Merchant, (merchant) => merchant.bankAccounts)
   merchant: Merchant;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @Column({ default: true })
