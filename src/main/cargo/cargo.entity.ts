@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Currency } from '../currencies/currency.entity';
 import { CargoType } from '../cargo-type/cargo-type.entity';
@@ -67,7 +67,7 @@ export class Cargo {
   @Column({ nullable: true })
   finish_lng?: string;
 
-  @Column({ default: new Date() })
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt?: Date;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.cargos, { nullable: false })
