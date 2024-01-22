@@ -22,6 +22,9 @@ export class Merchant {
   companyName: string;
 
   @Column({ nullable: true })
+  companyType: string;
+
+  @Column({ nullable: true })
   responsiblePersonLastName: string;
 
   @Column({ nullable: true })

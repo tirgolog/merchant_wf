@@ -1,6 +1,5 @@
 
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { PrimaryGeneratedColumn } from "typeorm";
 
 export class MerchantDto {
 
@@ -17,6 +16,10 @@ export class MerchantDto {
   @IsString()
   @IsNotEmpty()
   companyName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  companyType: string;
 
   @IsString()
   @IsNotEmpty()
