@@ -118,6 +118,7 @@ export class MerchantService {
       merchant.password = passwordHash;
       merchant.phoneNumber = createMerchantDto.phoneNumber;
       merchant.companyName = createMerchantDto.companyName;
+      merchant.companyType = createMerchantDto.companyType;
 
 
       const newMerchant = await this.merchantsRepository.save(merchant);
@@ -224,6 +225,7 @@ export class MerchantService {
       merchant.email = updateMerchantDto.email;
       merchant.phoneNumber = updateMerchantDto.phoneNumber;
       merchant.companyName = updateMerchantDto.companyName;
+      merchant.companyType = updateMerchantDto.companyType;
       
       if (updateMerchantDto.password) {
         const saltOrRounds = 10;
