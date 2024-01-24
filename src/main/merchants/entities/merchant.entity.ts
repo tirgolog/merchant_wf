@@ -40,6 +40,9 @@ export class Merchant {
   logoFilePath?: string;
 
   @Column({ nullable: true })
+  transportationCertificateFilePath?: string;
+
+  @Column({ nullable: true })
   notes?: string;
 
   @Column({ nullable: true })
