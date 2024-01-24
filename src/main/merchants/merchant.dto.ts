@@ -83,16 +83,10 @@ export class CompleteMerchantDto {
   dunsNumber?: number;
   ibanNumber?: number;
 
-  @IsString()
-  @IsNotEmpty()
   mfo?: string;
 
-  @IsString()
-  @IsNotEmpty()
   inn?: string;
 
-  @IsString()
-  @IsNotEmpty()
   oked?: string;
 
   @IsString()
@@ -111,8 +105,6 @@ export class CompleteMerchantDto {
   @IsNotEmpty()
   factAddress?: string;
 
-  @IsString()
-  @IsNotEmpty()
   bankName?: string;
 
   bankAccounts?: iBankAccount[];
