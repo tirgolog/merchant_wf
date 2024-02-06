@@ -68,8 +68,6 @@ export class CompleteMerchantDto {
   @IsNotEmpty()
   passportFilePath?: string;
 
-  @IsString()
-  @IsNotEmpty()
   logoFilePath?: string;
 
   taxPayerCode?: string;
