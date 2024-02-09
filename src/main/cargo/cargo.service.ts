@@ -101,9 +101,10 @@ export class CargosService {
     try {
       // Perform cargo finishing logic
       const cargo = await this.cargoRepository.findOneOrFail({ where: { id } });
+      console.log('cargo before finish', cargo)
       cargo.status = 2;
-      await this.cargoRepository.save(cargo);
-
+      const res = await this.cargoRepository.save(cargo);
+      console.log('cargo after finish', res)
       return new BpmResponse(true, null, null);
     } catch (error: any) {
       console.error(error);
