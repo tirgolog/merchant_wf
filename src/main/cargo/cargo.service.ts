@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
-import { BpmResponse, TransportType } from '..';
+import { BpmResponse, Transaction, TransportType } from '..';
 import { Cargo } from './cargo.entity';
 import { CargoDto } from './cargo.dto';
 import axios from 'axios';
@@ -13,6 +13,7 @@ export class CargosService {
   constructor(
     @InjectRepository(Cargo) private readonly cargoRepository: Repository<Cargo>,
     @InjectRepository(TransportType) private readonly transportTypesRepository: Repository<TransportType>,
+    @InjectRepository(Transaction) private readonly transactionsRepository: Repository<Transaction>,
     private eventsServcie: SseGateway
     // private readonly rabbitMQService: RabbitMQService
   ) { }
@@ -252,6 +253,31 @@ export class CargosService {
       // Connect to RabbitMQ
       this.connection = await amqp.connect("amqp://13.232.83.179:5672");
       this.channel = await this.connection.createChannel();
+
+      if (!createCargoDto.clientId) {
+        return new BpmResponse(false, null, ['Merchant is required']);
+      }
+      let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup', verified: true }, relations: ['merchant'] });
+      topup = topup.filter((el: any) => el.merchant?.id == createCargoDto.clientId)
+      let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow', verified: true }, relations: ['merchant'] });
+      withdrow = withdrow.filter((el: any) => el.merchant?.id == createCargoDto.clientId)
+
+      const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
+      const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
+      const token = await this.getToken();
+      const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId=' + createCargoDto.clientId, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = testData.data.data;
+      const balance = (((topupBalance - withdrowBalance) - data.totalFrozenAmount) - data.totalRemovalAmount);
+
+
+
+      if(createCargoDto.amount > balance) {
+        return new BpmResponse(false, null, ['notEnoughBalance'])
+      }
 
       // Send message to RabbitMQ queue
       await this.channel.assertQueue('acceptDriverOffer');
