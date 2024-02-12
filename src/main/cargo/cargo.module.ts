@@ -6,10 +6,11 @@ import { CargosService } from "./cargo.service";
 import { SharedModule } from "src/shared/modules/shared.module";
 import { RabbitMQService } from "src/shared/services/rabbitmq.service";
 import { TransportTypesModule } from "../transport-type/transport-type.module";
+import { Transaction } from "../transaction/transaction.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Cargo]),
+        TypeOrmModule.forFeature([Cargo, Transaction]),
         forwardRef(() => SharedModule),
         TransportTypesModule
     ],
@@ -20,7 +21,7 @@ import { TransportTypesModule } from "../transport-type/transport-type.module";
         CargosService
     ],
     exports: [
-        TypeOrmModule.forFeature([Cargo]),
+        TypeOrmModule.forFeature([Cargo, Transaction]),
         CargosService
     ]
 })
