@@ -175,23 +175,25 @@ export class TransactionService {
         return new BpmResponse(false, null, ['Transaction not found']);
       }
 
-      let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup', verified: true }, relations: ['merchant'] });
-      topup = topup.filter((el: any) => el.merchant?.id == transaction.merchant['id'])
-      let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow', verified: true }, relations: ['merchant'] });
-      withdrow = withdrow.filter((el: any) => el.merchant?.id == transaction.merchant['id'])
-
-      const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
-      const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
-      const token = await this.getToken();
-      const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId=' + id, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = testData.data.data;
-      const balance = (((topupBalance - withdrowBalance) - data.totalFrozenAmount) - data.totalRemovalAmount)
-      if (transaction.amount > balance) {
-        return new BpmResponse(false, null, ['notEnoughBalance']);
+      if(transaction.transactionType == 'withdrow') {
+        let topup = await this.transactionsRepository.find({ where: { active: true, transactionType: 'topup', verified: true }, relations: ['merchant'] });
+        topup = topup.filter((el: any) => el.merchant?.id == transaction.merchant['id'])
+        let withdrow = await this.transactionsRepository.find({ where: { active: true, transactionType: 'withdrow', verified: true }, relations: ['merchant'] });
+        withdrow = withdrow.filter((el: any) => el.merchant?.id == transaction.merchant['id'])
+  
+        const topupBalance = topup.reduce((a: any, b: any) => a + b.amount, 0);
+        const withdrowBalance = withdrow.reduce((a: any, b: any) => a + b.amount, 0);
+        const token = await this.getToken();
+        const testData = await axios.get('https://admin.tirgo.io/api/users/getMerchantBalance?clientId=' + id, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = testData.data.data;
+        const balance = (((topupBalance - withdrowBalance) - data.totalFrozenAmount) - data.totalRemovalAmount)
+        if (transaction.amount > balance) {
+          return new BpmResponse(false, null, ['notEnoughBalance']);
+        }
       }
       
       transaction.verified = true;
