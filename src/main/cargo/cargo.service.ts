@@ -250,10 +250,6 @@ export class CargosService {
 
   async acceptCargo(createCargoDto: any, userId: string) {
     try {
-      // Connect to RabbitMQ
-      this.connection = await amqp.connect("amqp://13.232.83.179:5672");
-      this.channel = await this.connection.createChannel();
-
       if (!createCargoDto.clientId) {
         return new BpmResponse(false, null, ['Merchant is required']);
       }
@@ -280,25 +276,33 @@ export class CargosService {
         return new BpmResponse(false, null, ['notEnoughBalance'])
       }
 
-      // Send message to RabbitMQ queue
-      await this.channel.assertQueue('acceptDriverOffer');
-      await this.channel.sendToQueue('acceptDriverOffer', Buffer.from(JSON.stringify(createCargoDto)));
+      const accept = await axios.post('https://admin.tirgo.io/api/users/acceptDriverOffer', createCargoDto, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const acceptedOrders = accept.data
+      if(acceptedOrders.status) {
+        
+        // Update cargo status in the database
+        console.log(createCargoDto)
+        console.log('Cargo status before update:', cargo.status);
+  
+        // Update cargo status
+        cargo.status = 1;
+        await this.cargoRepository.update({ id: cargo.id }, cargo);
+  
+        // Log updated cargo status
+        console.log('Cargo status after update:', cargo.status);
+  
+        // Close RabbitMQ connection
+        // await this.connection.close();
+        this.eventsServcie.sendUpdateBalance('1')
+        return new BpmResponse(true, null, null);
+      } else {
+        throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
 
-      // Update cargo status in the database
-      console.log(createCargoDto)
-      console.log('Cargo status before update:', cargo.status);
-
-      // Update cargo status
-      cargo.status = 1;
-      await this.cargoRepository.update({ id: cargo.id }, cargo);
-
-      // Log updated cargo status
-      console.log('Cargo status after update:', cargo.status);
-
-      // Close RabbitMQ connection
-      // await this.connection.close();
-      this.eventsServcie.sendUpdateBalance('1')
-      return new BpmResponse(true, null, null);
     } catch (error: any) {
       console.error(error);
 
