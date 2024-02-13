@@ -274,8 +274,9 @@ export class CargosService {
       const balance = (((topupBalance - withdrowBalance) - data.totalFrozenAmount) - data.totalRemovalAmount);
 
 
+      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: createCargoDto.orderId } });
 
-      if(createCargoDto.amount > balance) {
+      if(createCargoDto.amount > balance && cargo.isSafe) {
         return new BpmResponse(false, null, ['notEnoughBalance'])
       }
 
@@ -285,7 +286,6 @@ export class CargosService {
 
       // Update cargo status in the database
       console.log(createCargoDto)
-      const cargo = await this.cargoRepository.findOneOrFail({ where: { id: createCargoDto.orderId } });
       console.log('Cargo status before update:', cargo.status);
 
       // Update cargo status
