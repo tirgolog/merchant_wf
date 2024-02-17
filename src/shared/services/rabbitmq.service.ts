@@ -23,8 +23,7 @@ export class RabbitMQService implements OnModuleInit {
   async init() {
     this.connection = await amqp.connect("amqp://13.232.83.179:5672");
     this.channel = await this.connection.createChannel();
-    console.log('connection', this.connection)
-    console.log('asd')
+    console.log('rabbit')
     await this.channel.assertQueue('acceptDriverOffer');
     await this.channel.assertQueue('finishOrderDriver');
     await this.channel.assertQueue('acceptOrderDriver');
